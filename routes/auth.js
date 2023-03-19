@@ -46,6 +46,14 @@ var connection = mysql.createConnection({
     database : config.database
   });
 
+connection.connect((error) => {
+    if (error) {
+        console.error('Error connecting to MySQL server: ', error);
+        return;
+    }
+    console.log('Connected to MySQL server.');
+});
+
 async function sendTxtMsg(phone, otp){
     client.messages
     .create({
@@ -95,12 +103,10 @@ app.post('/login', async (req, res) => {
     let reqData = req.body;
     try {
         // make sure that any items are correctly URL encoded in the connection string
+      
         let otp = Math.floor(1000 + Math.random() * 9000);
         let phone = reqData.mobile;
-        await connection.connect((err) => {
-            if (err) throw err;
-            console.log('Connected to the database!');
-          });
+        
         let result;
         let queryStr = "SELECT * FROM users WHERE mobileNo = '" + reqData.mobile + "'";
         
@@ -110,11 +116,7 @@ app.post('/login', async (req, res) => {
                 res.send({ message:"error", err:error });
             }else if(results.length > 0 ){
                 result =JSON.parse(JSON.stringify(results[0]));                
-                await updateOTP(result.id, otp, phone);
-                await connection.end((err) => {
-                    if (err) throw err;
-                    console.log('Disconnected from the database!');
-                });              
+                await updateOTP(result.id, otp, phone);     
                 res.send({ message: "OTP Send Successfully"});
             }else{
                 res.send({ message: "user does't exist",  });
@@ -141,10 +143,7 @@ app.post('/register', async(req, res) => {
     try {
         // make sure that any items are correctly URL encoded in the connection string
         let otp = Math.floor(100000 + Math.random() * 900000);
-        await connection.connect((err) => {
-            if (err) throw err;
-            console.log('Connected to the database!');
-          });
+       
         let result;
         let queryStr = "SELECT * FROM users WHERE mobileNo = '" + reqData.mobile + "'";
         
@@ -157,10 +156,7 @@ app.post('/register', async(req, res) => {
                 res.send({ message: "User Already exist try login "});
             }else{
                 await insertUser(otp, reqData);
-                await connection.end((err) => {
-                    if (err) throw err;
-                    console.log('Disconnected from the database!');
-                });  
+                  
                 res.send({ message: "OTP Send Succesfully",  });
             }
 
@@ -185,10 +181,7 @@ app.post('/otpverify', async (req, res) => {
         // make sure that any items are correctly URL encoded in the connection string
         
         
-        await connection.connect((err) => {
-            if (err) throw err;
-            console.log('Connected to the database!');
-          });
+       
         let result;
         let token;
         let queryStr = "SELECT * FROM users WHERE mobileNo = '" + reqData.mobile + "' and otp = '" + reqData.otp + "'";
@@ -202,10 +195,7 @@ app.post('/otpverify', async (req, res) => {
                 result =JSON.parse(JSON.stringify(results[0]));                
                 // await updateOTP(result.id, otp, phone); 
                 token = jwt.sign({ user: result.mobileNo }, config.SECRET, { expiresIn: tokenExpireTime });
-                await connection.end((err) => {
-                    if (err) throw err;
-                    console.log('Disconnected from the database!');
-                });         
+                      
                 res.send({ message: "Otp Verifed", success: true, token:token, user:result});
             }else{
                 res.send({ message: "user does't exist",  });
