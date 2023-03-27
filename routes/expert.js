@@ -30,12 +30,12 @@ app.use(cookieParser());
 
 
 
-async function insertUser(reqData, next) {
+async function insertExpert(reqData, next) {
 
 
     let insertQuery =
       "INSERT INTO users (`firstName`,`lastName`, `name`, `email`,`mobileNo`,`otp`, `roleId`, `role`, `avatarURL`, `address`,  `city`, `zipCode`, `country`, `state`, `isVerified`, `createdAt`, `updatedAt`,`status`) VALUES ('" + 
-      reqData.firstName + "', '" + reqData.lastName + "', '" + reqData.name + "' , '" + reqData.email + "', '" + reqData.mobileNo + "', 1234 , '1' , 'Customer', 'https://minimal-assets-api-dev.vercel.app/assets/images/avatars/avatar_21.jpg', '"+ reqData.address +"',  '"+ reqData.city +"', '"+ reqData.zipCode +"', '"+ reqData.country +"', '"+ reqData.state +"', '"+ reqData.isVerified +"', '" + new Date().toJSON().slice(0, 19).replace('T', ' ')  + "', '" + new Date().toJSON().slice(0, 19).replace('T', ' ') + "', '1') ";
+      reqData.firstName + "', '" + reqData.lastName + "', '" + reqData.name + "' , '" + reqData.email + "', '" + reqData.mobileNo + "', 1234 , '3' , 'Expert', 'https://minimal-assets-api-dev.vercel.app/assets/images/avatars/avatar_21.jpg', '"+ reqData.address +"',  '"+ reqData.city +"', '"+ reqData.zipCode +"', '"+ reqData.country +"', '"+ reqData.state +"', '"+ reqData.isVerified +"', '" + new Date().toJSON().slice(0, 19).replace('T', ' ')  + "', '" + new Date().toJSON().slice(0, 19).replace('T', ' ') + "', '1') ";
     await connection.query(insertQuery, function (error, results, fields) {
       if (error) {
         console.log("error insert", error);
@@ -55,11 +55,11 @@ async function insertUser(reqData, next) {
 
 
 // admin get all users 
-app.get('/user', async (req, res) => {
+app.get('/expert', async (req, res) => {
     try {
         // make sure that any items are correctly URL encoded in the connection string     
         let result;
-        let queryStr = "SELECT * FROM users WHERE role = 'Customer' ";
+        let queryStr = "SELECT * FROM users WHERE role = 'Expert' ";
         
         await connection.query(queryStr, async function (error, results, fields) {
             
@@ -84,7 +84,7 @@ app.get('/user', async (req, res) => {
 
 
 // admin get single users 
-app.get('/user/:id', async (req, res) => {
+app.get('/expert/:id', async (req, res) => {
     let userId = req.params.id
     try {
         // make sure that any items are correctly URL encoded in the connection string       
@@ -112,7 +112,7 @@ app.get('/user/:id', async (req, res) => {
 
 
 // insert single user
-app.post('/user', async(req, res, next) => {
+app.post('/expert', async(req, res, next) => {
     let reqData = req.body;
     try {
         // make sure that any items are correctly URL encoded in the connection string
@@ -126,9 +126,9 @@ app.post('/user', async(req, res, next) => {
                 res.send({ message:"error", err:error });
             }else if(results.length > 0 ){
                 result =JSON.parse(JSON.stringify(results[0]));
-                res.send({ message: "User Already exist try login "});
+                res.send({ message: "Expert Already exist try login "});
             }else{
-                await insertUser(reqData, next);
+                await insertExpert(reqData, next);
                 res.send({ message: "OTP Send Succesfully",  });
             }            
         });          
@@ -140,7 +140,7 @@ app.post('/user', async(req, res, next) => {
 });
 
 // update single user 
-app.put('/user/:id', async (req, res) => {
+app.put('/expert/:id', async (req, res) => {
     let userId = req.params.id
     let reqData = req.body;
     console.log(reqData);
@@ -191,7 +191,7 @@ app.put('/user/:id', async (req, res) => {
 
 // delete user from table
 
-app.delete('/user/:id', async (req, res) => {
+app.delete('/expert/:id', async (req, res) => {
     let userId = req.params.id
     try {
         
