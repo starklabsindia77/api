@@ -1,5 +1,7 @@
 
 var mysql      = require('mysql');
+
+var connection = require('../middlewares/database');
 const express = require("express");
 const app = express();
 const cors = require('cors')
@@ -17,8 +19,7 @@ var cron = require('node-cron');
 
 
 serverUrl = config.serverUrl
-const dbString = config.dbString;
-let enableJobs = config.enableJobs;
+
 app.use(cors())
 //to not get any deprecation warning or error
 //support parsing of application/x-www-form-urlencoded post data
@@ -31,39 +32,47 @@ app.use(cookieParser());
 
 
 
-var connection = mysql.createConnection({
-    host     : config.host,
-    user     : config.user,
-    password : config.password,
-    port: config.port,
-    database : config.database
-  });
+async function insertUser(reqData, next) {
 
 
-connection.connect((error) => {
-    if (error) {
-        console.error('Error connecting to MySQL server: ', error);
-        return;
-    }
-    console.log('Connected to MySQL server.');
-});
+    let insertQuery =
+      "INSERT INTO users (`firstName`,`lastName`, `name`, `email`,`mobileNo`,`otp`, `roleId`, `role`, `avatarURL`, `address`,  `city`, `zipCode`, `country`, `state`, `isVerified`, `createdAt`, `updatedAt`,`status`) VALUES ('" + 
+      reqData.firstName + "', '" + reqData.lastName + "', '" + reqData.name + "' , '" + reqData.email + "', '" + reqData.mobileNo + "', 1234 , '1' , 'Customer', 'https://minimal-assets-api-dev.vercel.app/assets/images/avatars/avatar_21.jpg', '"+ reqData.address +"',  '"+ reqData.city +"', '"+ reqData.zipCode +"', '"+ reqData.country +"', '"+ reqData.state +"', '"+ reqData.isVerified +"', '" + new Date().toJSON().slice(0, 19).replace('T', ' ')  + "', '" + new Date().toJSON().slice(0, 19).replace('T', ' ') + "', '1') ";
+    await connection.query(insertQuery, function (error, results, fields) {
+      if (error) {
+        console.log("error insert", error);
+        // res.send({ message:"error", err:error });
+      } else {
+        console.log("result ", results);
+        next();
+      }
+  
+      updateResponse = JSON.parse(JSON.stringify(results));
+      console.log("result error", updateResponse);
+    });
+  }
+
+
+
 
 
 // admin get all users 
 app.get('/user', async (req, res) => {
     try {
-        // make sure that any items are correctly URL encoded in the connection string       
+        // make sure that any items are correctly URL encoded in the connection string     
         let result;
         let queryStr = "SELECT * FROM users";
         
         await connection.query(queryStr, async function (error, results, fields) {
+            
             if (error){
                 // console.log("error", error);
                 res.send({ message:"error", err:error });
             }else if(results.length > 0 ){
-                result =JSON.parse(JSON.stringify(results[0]));                
+                
+                // result =JSON.parse(JSON.stringify(results[0]));                
                 // await updateOTP(result.id, otp, phone);     
-                res.send({ status: true, data: result});
+                res.send({ status: true, user: results});
             }else{
                 res.send({ status: true, data: []});
             } 
@@ -91,7 +100,7 @@ app.get('/user/:id', async (req, res) => {
             }else if(results.length > 0 ){
                 result =JSON.parse(JSON.stringify(results[0]));                
                 // await updateOTP(result.id, otp, phone);     
-                res.send({ status: true, data: result});
+                res.send({ status: true, user: result});
             }else{
                 res.send({ status: true, data: []});
             } 
@@ -105,7 +114,7 @@ app.get('/user/:id', async (req, res) => {
 
 
 // insert single user
-app.post('/user', async(req, res) => {
+app.post('/user', async(req, res, next) => {
     let reqData = req.body;
     try {
         // make sure that any items are correctly URL encoded in the connection string
@@ -121,7 +130,7 @@ app.post('/user', async(req, res) => {
                 result =JSON.parse(JSON.stringify(results[0]));
                 res.send({ message: "User Already exist try login "});
             }else{
-                await insertUser(otp, reqData);
+                await insertUser(reqData, next);
                 res.send({ message: "OTP Send Succesfully",  });
             }            
         });          
@@ -136,20 +145,40 @@ app.post('/user', async(req, res) => {
 app.put('/user/:id', async (req, res) => {
     let userId = req.params.id
     let reqData = req.body;
+    console.log(reqData);
     try {
         // make sure that any items are correctly URL encoded in the connection string     
+        if(reqData.status === 'active'){
+            reqData.status = 0;
+        }else{
+            reqData.status = 1;
+        }
         let result;
-        let token;
-        let queryStr = "SELECT * FROM users WHERE mobileNo = '" + reqData.mobile + "' and otp = '" + reqData.otp + "'";
+        let queryStr = "UPDATE users SET firstName = '"+ reqData.firstName + "'," +
+        "lastName = '"+ reqData.lastName + "', " + 
+        "name = '"+ reqData.name + "'," +
+        "email = '"+ reqData.email + "', " +
+        "mobileNo = '"+ reqData.mobileNo + "', " +
+        "roleId = '"+ reqData.roleId + "', " +
+        "role = '"+ reqData.role + "', " +
+        "avatarUrl = '"+ reqData.avatarUrl + "', " +
+        "address = '"+ reqData.address + "', " +
+        "city = '"+ reqData.city + "', " +
+        "zipCode = '"+ reqData.zipCode + "', " +
+        "country = '"+ reqData.country + "', " +
+        "state = '"+ reqData.state + "', " +
+        "isVerified = "+ reqData.isVerified + ", " +
+        "updatedAt = '"+ new Date().toJSON().slice(0, 19).replace('T', ' ') + "', " +
+        "status = '"+ reqData.status + "' WHERE id = "+ userId +";"
         
-        console.log("string", queryStr);
+        // console.log("string", queryStr);
         await connection.query(queryStr, async function (error, results, fields) {
+            console.log(error, results);
             if (error){
                 // console.log("error", error);
                 res.send({ message:"error", err:error });
             }else if(results.length > 0 ){
-                result =JSON.parse(JSON.stringify(results[0]));                
-                      
+                result =JSON.parse(JSON.stringify(results[0]));           
                 res.send({ message: "user is updated", success: true, data:result});
             }else{
                 res.send({ message: "user does't exist",  });
@@ -167,10 +196,12 @@ app.put('/user/:id', async (req, res) => {
 app.delete('/user/:id', async (req, res) => {
     let userId = req.params.id
     try {
+        
         // make sure that any items are correctly URL encoded in the connection string
         let result;
         let queryStr = "DELETE FROM users WHERE id = '" + userId + "'";
         await connection.query(queryStr, async function (error, results, fields) {
+           +91
             if (error){
                 // console.log("error", error);
                 res.send({ message:"error", err:error });

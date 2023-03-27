@@ -23,18 +23,20 @@ app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 //to get json data
 // support parsing of application/json type post data
 
-const userRoutes = require("./api/user");
-// const universityRoutes = require("./api/university");
+
+const userRoutes = require("./routes/user");
+const adminRoutes = require("./routes/adminauth");
 // const wishRoutes = require("./api/wishlist");
 // const roleRoutes = require("./api/role");
 const authRoutes = require("./routes/auth");
 // const applicationRoutes = require("./api/application");
 // const ProfileRoutes = require("./api/profile");
 
-app.use("/api", userRoutes);
+app.use("/api/admin", userRoutes);
 // app.use("/api", universityRoutes);
 // app.use("/api", wishRoutes);
 // app.use("/api", roleRoutes);
+app.use("/api/admin", adminRoutes);
 app.use("/api", authRoutes);
 // app.use("/api", applicationRoutes);
 // app.use("/api", ProfileRoutes);
