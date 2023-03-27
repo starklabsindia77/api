@@ -7,6 +7,9 @@ var connection = mysql.createConnection({
     user     : config.user,
     password : config.password,
     port: config.port,
+    connectionLimit: 15,
+    queueLimit: 30,
+    acquireTimeout: 1000000,
     database : config.database
   });
 
