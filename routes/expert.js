@@ -6,6 +6,7 @@ const cors = require('cors')
 const _ = require('lodash');
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
+const bcrypt = require('bcryptjs');
 var Guid = require('guid');
 const config = require("../key");
 // const fetch = require('node-fetch');
@@ -32,21 +33,24 @@ app.use(cookieParser());
 
 async function insertExpert(reqData, next) {
 
-
+    if(!reqData.password){
+        reqData.password = "demo1234";
+    }
+    const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(reqData.password, salt);
     let insertQuery =
-      "INSERT INTO users (`firstName`,`lastName`, `name`, `email`,`mobileNo`,`otp`, `roleId`, `role`, `avatarURL`, `address`,  `city`, `zipCode`, `country`, `state`, `isVerified`, `createdAt`, `updatedAt`,`status`) VALUES ('" + 
-      reqData.firstName + "', '" + reqData.lastName + "', '" + reqData.name + "' , '" + reqData.email + "', '" + reqData.mobileNo + "', 1234 , '3' , 'Expert', 'https://minimal-assets-api-dev.vercel.app/assets/images/avatars/avatar_21.jpg', '"+ reqData.address +"',  '"+ reqData.city +"', '"+ reqData.zipCode +"', '"+ reqData.country +"', '"+ reqData.state +"', '"+ reqData.isVerified +"', '" + new Date().toJSON().slice(0, 19).replace('T', ' ')  + "', '" + new Date().toJSON().slice(0, 19).replace('T', ' ') + "', '1') ";
+      "INSERT INTO adminusers (`firstName`,`lastName`, `displayName`, `email`,`mobileNo`,`password`, `roleId`, `role`, `photoURL`, `address` ,  `city` , `zipCode` , `country` , `state` , `isVerified`, `createdAt`, `updatedAt`,`status`) VALUES ('" + 
+      reqData.firstName + "', '" + reqData.lastName + "', '" + reqData.firstName +' '+ reqData.lastName + "' , '" + reqData.email + "', '" + reqData.mobileNo + "', '" + hashedPassword + "', '3' , 'Expert', 'https://minimal-assets-api-dev.vercel.app/assets/images/avatars/avatar_default.jpg', '" + reqData.address + "', '" + reqData.city + "', '" + reqData.zipcode + "', '" + reqData.country + "', '" + reqData.state + "', '" + reqData.isVerified + "', '" + new Date().toJSON().slice(0, 19).replace('T', ' ')  + "', '" + new Date().toJSON().slice(0, 19).replace('T', ' ') + "', '1') ";
     await connection.query(insertQuery, function (error, results, fields) {
       if (error) {
         console.log("error insert", error);
         // res.send({ message:"error", err:error });
       } else {
         console.log("result ", results);
-        next();
       }
-  
-      updateResponse = JSON.parse(JSON.stringify(results));
-      console.log("result error", updateResponse);
+      next();
+    //   updateResponse = JSON.parse(JSON.stringify(results));
+    //   console.log("result error", updateResponse);
     });
   }
 
@@ -152,14 +156,19 @@ app.put('/expert/:id', async (req, res) => {
             reqData.status = 1;
         }
         let result;
-        let queryStr = "UPDATE users SET firstName = '"+ reqData.firstName + "'," +
+        let queryStr;
+        if(reqData.password){           
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(reqData.password, salt);
+            queryStr = "UPDATE users SET firstName = '"+ reqData.firstName + "'," +
         "lastName = '"+ reqData.lastName + "', " + 
-        "name = '"+ reqData.name + "'," +
+        "displayName = '"+reqData.firstName + + reqData.lastName + "'," +
         "email = '"+ reqData.email + "', " +
+        "password = '"+ hashedPassword + "', " +
         "mobileNo = '"+ reqData.mobileNo + "', " +
         "roleId = '"+ reqData.roleId + "', " +
         "role = '"+ reqData.role + "', " +
-        "avatarUrl = '"+ reqData.avatarUrl + "', " +
+        "photoURL = '"+ reqData.avatarUrl + "', " +
         "address = '"+ reqData.address + "', " +
         "city = '"+ reqData.city + "', " +
         "zipCode = '"+ reqData.zipCode + "', " +
@@ -168,6 +177,26 @@ app.put('/expert/:id', async (req, res) => {
         "isVerified = "+ reqData.isVerified + ", " +
         "updatedAt = '"+ new Date().toJSON().slice(0, 19).replace('T', ' ') + "', " +
         "status = '"+ reqData.status + "' WHERE id = "+ userId +";"
+
+        }else{
+            queryStr = "UPDATE users SET firstName = '"+ reqData.firstName + "'," +
+        "lastName = '"+ reqData.lastName + "', " + 
+        "displayName = '"+reqData.firstName + + reqData.lastName + "'," +
+        "email = '"+ reqData.email + "', " +
+        "mobileNo = '"+ reqData.mobileNo + "', " +
+        "roleId = '"+ reqData.roleId + "', " +
+        "role = '"+ reqData.role + "', " +
+        "photoURL = '"+ reqData.avatarUrl + "', " +
+        "address = '"+ reqData.address + "', " +
+        "city = '"+ reqData.city + "', " +
+        "zipCode = '"+ reqData.zipCode + "', " +
+        "country = '"+ reqData.country + "', " +
+        "state = '"+ reqData.state + "', " +
+        "isVerified = "+ reqData.isVerified + ", " +
+        "updatedAt = '"+ new Date().toJSON().slice(0, 19).replace('T', ' ') + "', " +
+        "status = '"+ reqData.status + "' WHERE id = "+ userId +";"
+        }
+        
         
         // console.log("string", queryStr);
         await connection.query(queryStr, async function (error, results, fields) {
