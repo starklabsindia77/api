@@ -63,7 +63,7 @@ app.get('/expert', async (req, res) => {
     try {
         // make sure that any items are correctly URL encoded in the connection string     
         let result;
-        let queryStr = "SELECT * FROM users WHERE role = 'Expert' ";
+        let queryStr = "SELECT * FROM adminusers WHERE role = 'Expert' ";
         
         await connection.query(queryStr, async function (error, results, fields) {
             
@@ -93,7 +93,7 @@ app.get('/expert/:id', async (req, res) => {
     try {
         // make sure that any items are correctly URL encoded in the connection string       
         let result;
-        let queryStr = "SELECT * FROM users Where id = '"+ userId +"'";
+        let queryStr = "SELECT * FROM adminusers Where id = '"+ userId +"'";
         
         await connection.query(queryStr, async function (error, results, fields) {
             if (error){
@@ -122,7 +122,7 @@ app.post('/expert', async(req, res, next) => {
         // make sure that any items are correctly URL encoded in the connection string
        
         let result;
-        let queryStr = "SELECT * FROM users WHERE mobileNo = '" + reqData.mobile + "'";
+        let queryStr = "SELECT * FROM adminusers WHERE mobileNo = '" + reqData.mobile + "'";
         
         await connection.query(queryStr, async function (error, results, fields) {
             if (error){
@@ -160,7 +160,7 @@ app.put('/expert/:id', async (req, res) => {
         if(reqData.password){           
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(reqData.password, salt);
-            queryStr = "UPDATE users SET firstName = '"+ reqData.firstName + "'," +
+            queryStr = "UPDATE adminusers SET firstName = '"+ reqData.firstName + "'," +
         "lastName = '"+ reqData.lastName + "', " + 
         "displayName = '"+reqData.firstName + + reqData.lastName + "'," +
         "email = '"+ reqData.email + "', " +
@@ -179,7 +179,7 @@ app.put('/expert/:id', async (req, res) => {
         "status = '"+ reqData.status + "' WHERE id = "+ userId +";"
 
         }else{
-            queryStr = "UPDATE users SET firstName = '"+ reqData.firstName + "'," +
+            queryStr = "UPDATE adminusers SET firstName = '"+ reqData.firstName + "'," +
         "lastName = '"+ reqData.lastName + "', " + 
         "displayName = '"+reqData.firstName + + reqData.lastName + "'," +
         "email = '"+ reqData.email + "', " +
@@ -226,7 +226,7 @@ app.delete('/expert/:id', async (req, res) => {
         
         // make sure that any items are correctly URL encoded in the connection string
         let result;
-        let queryStr = "DELETE FROM users WHERE id = '" + userId + "'";
+        let queryStr = "DELETE FROM adminusers WHERE id = '" + userId + "'";
         await connection.query(queryStr, async function (error, results, fields) {
            +91
             if (error){
