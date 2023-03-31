@@ -1,5 +1,6 @@
 
 var connection = require('../middlewares/database');
+var upload = require('../middlewares/upload');
 const express = require("express");
 const app = express();
 const cors = require('cors')
@@ -143,7 +144,7 @@ app.post('/user', async(req, res, next) => {
 app.put('/user/:id', async (req, res) => {
     let userId = req.params.id
     let reqData = req.body;
-    console.log(reqData);
+    await upload(req, res)
     try {
         // make sure that any items are correctly URL encoded in the connection string     
         if(reqData.status === 'active'){
@@ -157,9 +158,7 @@ app.put('/user/:id', async (req, res) => {
         "name = '"+ reqData.name + "'," +
         "email = '"+ reqData.email + "', " +
         "mobileNo = '"+ reqData.mobileNo + "', " +
-        "roleId = '"+ reqData.roleId + "', " +
-        "role = '"+ reqData.role + "', " +
-        "avatarUrl = '"+ reqData.avatarUrl + "', " +
+        // "avatarUrl = '"+ reqData.avatarUrl + "', " +
         "address = '"+ reqData.address + "', " +
         "city = '"+ reqData.city + "', " +
         "zipCode = '"+ reqData.zipCode + "', " +
@@ -171,7 +170,7 @@ app.put('/user/:id', async (req, res) => {
         
         // console.log("string", queryStr);
         await connection.query(queryStr, async function (error, results, fields) {
-            console.log(error, results);
+            // console.log(error, results);
             if (error){
                 // console.log("error", error);
                 res.send({ message:"error", err:error });
