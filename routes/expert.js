@@ -15,6 +15,7 @@ const formidable = require('formidable');
 var Promise = require("bluebird");
 Promise.longStackTraces();
 var cron = require('node-cron');
+const validateUserToken = require('../middlewares/verify-token');
 
 
 serverUrl = config.serverUrl
@@ -64,6 +65,33 @@ app.get('/expert', async (req, res) => {
         // make sure that any items are correctly URL encoded in the connection string     
         let result;
         let queryStr = "SELECT * FROM adminusers WHERE role = 'Expert' ";
+        
+        await connection.query(queryStr, async function (error, results, fields) {
+            
+            if (error){
+                // console.log("error", error);
+                res.send({ message:"error", err:error });
+            }else if(results.length > 0 ){
+                
+                // result =JSON.parse(JSON.stringify(results[0]));                
+                // await updateOTP(result.id, otp, phone);     
+                res.send({ status: true, user: results});
+            }else{
+                res.send({ status: true, data: []});
+            } 
+        });
+    } catch (err) {
+        // ... error checks
+        console.log("errornew", err);
+        res.send(err);
+    }
+});
+app.get('/expertsingle', validateUserToken , async (req, res) => {
+    try {
+        // make sure that any items are correctly URL encoded in the connection string     
+        let result;
+        console.log(req.decoded)
+        let queryStr = "SELECT * FROM adminusers";
         
         await connection.query(queryStr, async function (error, results, fields) {
             

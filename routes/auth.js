@@ -65,13 +65,13 @@ async function updateOTP(id, otp, phone) {
 
 async function insertUser(otp, reqData) {
   let insertQuery =
-    "INSERT INTO users ( `email`, `mobileNo`, `otp`, `roleId`) VALUES ( '" +
+    "INSERT INTO users ( `email`, `mobileNo`, `otp`, `roleId`, `role`) VALUES ( '" +
     reqData.email +
     "', '" +
     reqData.mobile +
     "', '" +
     otp +
-    "', 1);";
+    "', 1, 'Customer');";
   await connection.query(insertQuery, function (error, results, fields) {
     if (error) {
       console.log("error insert", error);
