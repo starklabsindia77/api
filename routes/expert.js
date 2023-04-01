@@ -35,11 +35,10 @@ app.use(cookieParser());
 
 async function updateExpertInfo(reqData, insertId, next){
     let insertQuery =
-      "UPDATE expertInfo" +
-      "SET `skill` = '" + reqData.skill + "', " + 
+      "UPDATE expertInfo SET `skill` = '" + reqData.skill + "', " + 
       "`bio` = '" + reqData.bio + "'," +
       "`bookingAmount` = '200'," +     
-      "`updatedAt` = '" + new Date().toJSON().slice(0, 19).replace('T', ' ') + "' WHERE `usersId` = '" + insertId + "'";
+      "`updatedAt` = '" + new Date().toJSON().slice(0, 19).replace('T', ' ') + "' WHERE `id` = " + insertId + "";
     await connection.query(insertQuery, function (error, results, fields) {
       if (error) {
         console.log("error insert", error);
@@ -99,7 +98,7 @@ app.get('/expert', async (req, res) => {
         // make sure that any items are correctly URL encoded in the connection string     
         let result;
         //let queryStr = "SELECT * FROM adminusers WHERE role = 'Expert' ";
-        let queryStr = "SELECT * FROM adminusers as au left outer Join expertInfo as ei on au.id = ei.usersId WHERE au.role = 'Expert'";
+        let queryStr = "SELECT au.id as expertId, au.*, ei.* FROM adminusers as au left outer Join expertInfo as ei on au.id = ei.usersId WHERE au.role = 'Expert'";
         
         await connection.query(queryStr, async function (error, results, fields) {
             
@@ -156,7 +155,7 @@ app.get('/expert/:id', async (req, res) => {
     try {
         // make sure that any items are correctly URL encoded in the connection string       
         let result;
-        let queryStr = "SELECT * FROM adminusers Where id = '"+ userId +"'";
+        let queryStr = "SELECT au.id as expertId, au.*, ei.* FROM adminusers as au left outer Join expertInfo as ei on au.id = ei.usersId Where au.id = '"+ userId +"'";
         
         await connection.query(queryStr, async function (error, results, fields) {
             if (error){
@@ -210,6 +209,7 @@ app.post('/expert', upload, async(req, res, next) => {
 app.put('/expert/:id', upload, async (req, res, next) => {
     let userId = req.params.id
     let reqData = req.body;
+    console.log("req", reqData);
     try {
         // make sure that any items are correctly URL encoded in the connection string     
         if(reqData.status === 'active'){
@@ -241,12 +241,10 @@ app.put('/expert/:id', upload, async (req, res, next) => {
         }else{
             queryStr = "UPDATE adminusers SET firstName = '"+ reqData.firstName + "'," +
         "lastName = '"+ reqData.lastName + "', " + 
-        "displayName = '"+reqData.firstName + + reqData.lastName + "'," +
+        "displayName = '"+reqData.firstName + ' ' + reqData.lastName + "'," +
         "email = '"+ reqData.email + "', " +
         "mobileNo = '"+ reqData.mobileNo + "', " +
-        "roleId = '"+ reqData.roleId + "', " +
-        "role = '"+ reqData.role + "', " +
-        "photoURL = '"+ reqData.avatarUrl + "', " +
+        "photoURL = '"+ reqData.photoURL + "', " +
         "address = '"+ reqData.address + "', " +
         "city = '"+ reqData.city + "', " +
         "zipCode = '"+ reqData.zipCode + "', " +
@@ -264,12 +262,10 @@ app.put('/expert/:id', upload, async (req, res, next) => {
             if (error){
                 // console.log("error", error);
                 res.send({ message:"error", err:error });
-            }else if(results.length > 0 ){
-                result =JSON.parse(JSON.stringify(results[0]));
-                updateExpertInfo(reqData, userId, next);          
-                res.send({ message: "user is updated", success: true, data:result});
             }else{
-                res.send({ message: "user does't exist",  });
+                updateExpertInfo(reqData, reqData.id, next);          
+                res.send({ message: "user is updated", success: true});
+                
             }            
         });
     } catch (err) {
