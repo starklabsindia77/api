@@ -33,10 +33,9 @@ app.use(cookieParser());
 
 async function insertUser(reqData, next) {
 
-
     let insertQuery =
       "INSERT INTO users (`firstName`,`lastName`, `name`, `email`,`mobileNo`,`otp`, `roleId`, `role`, `avatarURL`, `address`,  `city`, `zipCode`, `country`, `state`, `isVerified`, `createdAt`, `updatedAt`,`status`) VALUES ('" + 
-      reqData.firstName + "', '" + reqData.lastName + "', '" + reqData.name + "' , '" + reqData.email + "', '" + reqData.mobileNo + "', 1234 , '1' , 'Customer', 'https://minimal-assets-api-dev.vercel.app/assets/images/avatars/avatar_21.jpg', '"+ reqData.address +"',  '"+ reqData.city +"', '"+ reqData.zipCode +"', '"+ reqData.country +"', '"+ reqData.state +"', '"+ reqData.isVerified +"', '" + new Date().toJSON().slice(0, 19).replace('T', ' ')  + "', '" + new Date().toJSON().slice(0, 19).replace('T', ' ') + "', '1') ";
+      reqData.firstName + "', '" + reqData.lastName + "', '" + reqData.name + "' , '" + reqData.email + "', '" + reqData.mobileNo + "', 1234 , '1' , 'Customer', '" + reqData.avatarUrl + "', '"+ reqData.address +"',  '"+ reqData.city +"', '"+ reqData.zipCode +"', '"+ reqData.country +"', '"+ reqData.state +"', '"+ reqData.isVerified +"', '" + new Date().toJSON().slice(0, 19).replace('T', ' ')  + "', '" + new Date().toJSON().slice(0, 19).replace('T', ' ') + "', '1') ";
     await connection.query(insertQuery, function (error, results, fields) {
       if (error) {
         console.log("error insert", error);
@@ -113,7 +112,7 @@ app.get('/user/:id', async (req, res) => {
 
 
 // insert single user
-app.post('/user', async(req, res, next) => {
+app.post('/user', upload, async(req, res, next) => {
     let reqData = req.body;
     try {
         // make sure that any items are correctly URL encoded in the connection string
@@ -141,10 +140,12 @@ app.post('/user', async(req, res, next) => {
 });
 
 // update single user 
-app.put('/user/:id', async (req, res) => {
+app.put('/user/:id', upload, async (req, res) => {
     let userId = req.params.id
     let reqData = req.body;
-    await upload(req, res)
+    // let uploadLocation = await upload(reqData, res);
+    // console.log("upload value", uploadLocation);
+    // reqData.avatarUrl = uploadLocation;
     try {
         // make sure that any items are correctly URL encoded in the connection string     
         if(reqData.status === 'active'){
@@ -158,7 +159,7 @@ app.put('/user/:id', async (req, res) => {
         "name = '"+ reqData.name + "'," +
         "email = '"+ reqData.email + "', " +
         "mobileNo = '"+ reqData.mobileNo + "', " +
-        // "avatarUrl = '"+ reqData.avatarUrl + "', " +
+        "avatarUrl = '"+ reqData.avatarUrl + "', " +
         "address = '"+ reqData.address + "', " +
         "city = '"+ reqData.city + "', " +
         "zipCode = '"+ reqData.zipCode + "', " +

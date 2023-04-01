@@ -1,5 +1,6 @@
 
 var connection = require('../middlewares/database');
+var upload = require('../middlewares/upload');
 const express = require("express");
 const app = express();
 const cors = require('cors')
@@ -16,20 +17,7 @@ var Promise = require("bluebird");
 Promise.longStackTraces();
 var cron = require('node-cron');
 const validateUserToken = require('../middlewares/verify-token');
-// const AWS = require('aws-sdk');
-// const fs = require('fs');
 
-// Set the region and credentials for AWS SDK
-// AWS.config.update({
-//   accessKeyId: config.AWS_ACCESS_KEY_ID,
-//   secretAccessKey: config.AWS_ACCESS_KEY_SECRET,
-// //   region: config.AWS_REGION
-// });
-
-// // Create an instance of the S3 service
-// const s3 = new AWS.S3();
-
-// Set the parameters for the S3 bucket and the file you want to upload
 
 
 
@@ -47,12 +35,11 @@ app.use(cookieParser());
 
 async function updateExpertInfo(reqData, insertId, next){
     let insertQuery =
-      "UPDATE `databaseAstro`.`expertInfo`" +
+      "UPDATE expertInfo" +
       "SET `skill` = '" + reqData.skill + "', " + 
       "`bio` = '" + reqData.bio + "'," +
       "`bookingAmount` = '200'," +     
-      "`updatedAt` = " + new Date().toJSON().slice(0, 19).replace('T', ' ') + 
-      "WHERE `usersId` = '" + insertId + "'";
+      "`updatedAt` = '" + new Date().toJSON().slice(0, 19).replace('T', ' ') + "' WHERE `usersId` = '" + insertId + "'";
     await connection.query(insertQuery, function (error, results, fields) {
       if (error) {
         console.log("error insert", error);
@@ -61,16 +48,13 @@ async function updateExpertInfo(reqData, insertId, next){
         console.log("result ", results);
         next();
       }
-      
-    //   updateResponse = JSON.parse(JSON.stringify(results));
-    //   console.log("result error", updateResponse);
     });
 }
 async function insertExpertInfo(reqData, insertId, next){
     let insertQuery =
-      "INSERT INTO `databaseAstro`.`expertInfo` ( `skill`, `bio`, `bookingAmount`, `usersId`, `createdAt`, `updatedAt`, `status`)" +
-      "VALUES (  '" + reqData.skill + "',  '" + reqData.bio + "', '200',  '" + insertId + "', " +
-      new Date().toJSON().slice(0, 19).replace('T', ' ') + "', " + new Date().toJSON().slice(0, 19).replace('T', ' ') + "', 1)";
+      "INSERT INTO expertInfo ( `skill`, `bio`, `bookingAmount`, `usersId`, `createdAt`, `updatedAt`, `status`)" +
+      "VALUES (  '" + reqData.skill + "',  '" + reqData.bio + "', '200',  " + insertId + ", '" +
+      new Date().toJSON().slice(0, 19).replace('T', ' ') + "', '" + new Date().toJSON().slice(0, 19).replace('T', ' ') + "', 1)";
     await connection.query(insertQuery, function (error, results, fields) {
       if (error) {
         console.log("error insert", error);
@@ -79,9 +63,6 @@ async function insertExpertInfo(reqData, insertId, next){
         console.log("result ", results);
         next();
       }
-      
-    //   updateResponse = JSON.parse(JSON.stringify(results));
-    //   console.log("result error", updateResponse);
     });
 }
 async function insertExpert(reqData, next) {
@@ -89,27 +70,11 @@ async function insertExpert(reqData, next) {
     if(!reqData.password){
         reqData.password = "demo1234";
     }
-    // const params = {
-    //     Bucket: config.AWS_BUCKET_NAME,      // bucket that we made earlier
-    //     Key: req.file.originalname,               // Name of the image
-    //     Body: req.file.buffer,                    // Body which will contain the image in buffer format
-    //     ACL: "public-read-write",                 // defining the permissions to get the public link
-    //     ContentType: "image/jpeg"                 // Necessary to define the image content-type to view the photo in the browser with the link
-    // };
-    
-    // // Upload the file to the S3 bucket
-    // s3.upload(params, (err, data) => {
-    //   if (err) {
-    //     console.log('Error uploading file:', err);
-    //   } else {
-    //     console.log('File uploaded successfully:', data.Location);
-    //   }
-    // });
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(reqData.password, salt);
     let insertQuery =
       "INSERT INTO adminusers (`firstName`,`lastName`, `displayName`, `email`,`mobileNo`,`password`, `roleId`, `role`, `photoURL`, `address` ,  `city` , `zipCode` , `country` , `state` , `isVerified`, `createdAt`, `updatedAt`,`status`) VALUES ('" + 
-      reqData.firstName + "', '" + reqData.lastName + "', '" + reqData.firstName +' '+ reqData.lastName + "' , '" + reqData.email + "', '" + reqData.mobileNo + "', '" + hashedPassword + "', '3' , 'Expert', 'https://minimal-assets-api-dev.vercel.app/assets/images/avatars/avatar_default.jpg', '" + reqData.address + "', '" + reqData.city + "', '" + reqData.zipcode + "', '" + reqData.country + "', '" + reqData.state + "', '" + reqData.isVerified + "', '" + new Date().toJSON().slice(0, 19).replace('T', ' ')  + "', '" + new Date().toJSON().slice(0, 19).replace('T', ' ') + "', '1') ";
+      reqData.firstName + "', '" + reqData.lastName + "', '" + reqData.firstName +' '+ reqData.lastName + "' , '" + reqData.email + "', '" + reqData.mobileNo + "', '" + hashedPassword + "', '3' , 'Expert', '" + reqData.photoURL + "' , '" + reqData.address + "', '" + reqData.city + "', '" + reqData.zipcode + "', '" + reqData.country + "', '" + reqData.state + "', '" + reqData.isVerified + "', '" + new Date().toJSON().slice(0, 19).replace('T', ' ')  + "', '" + new Date().toJSON().slice(0, 19).replace('T', ' ') + "', '1') ";
     await connection.query(insertQuery, function (error, results, fields) {
       if (error) {
         console.log("error insert", error);
@@ -214,7 +179,7 @@ app.get('/expert/:id', async (req, res) => {
 
 
 // insert single user
-app.post('/expert', async(req, res, next) => {
+app.post('/expert', upload, async(req, res, next) => {
     let reqData = req.body;
     try {
         // make sure that any items are correctly URL encoded in the connection string
@@ -242,10 +207,9 @@ app.post('/expert', async(req, res, next) => {
 });
 
 // update single user 
-app.put('/expert/:id', async (req, res, next) => {
+app.put('/expert/:id', upload, async (req, res, next) => {
     let userId = req.params.id
     let reqData = req.body;
-    console.log(reqData);
     try {
         // make sure that any items are correctly URL encoded in the connection string     
         if(reqData.status === 'active'){
@@ -264,7 +228,7 @@ app.put('/expert/:id', async (req, res, next) => {
         "email = '"+ reqData.email + "', " +
         "password = '"+ hashedPassword + "', " +
         "mobileNo = '"+ reqData.mobileNo + "', " +
-        "photoURL = '"+ reqData.avatarUrl + "', " +
+        "photoURL = '"+ reqData.photoURL + "', " +
         "address = '"+ reqData.address + "', " +
         "city = '"+ reqData.city + "', " +
         "zipCode = '"+ reqData.zipCode + "', " +
@@ -319,6 +283,7 @@ app.put('/expert/:id', async (req, res, next) => {
 
 app.delete('/expert/:id', async (req, res) => {
     let userId = req.params.id
+    console.log('delete user', userId);
     try {
         
         // make sure that any items are correctly URL encoded in the connection string
