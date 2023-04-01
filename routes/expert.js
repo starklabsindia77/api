@@ -33,6 +33,30 @@ app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 // support parsing of application/json type post data
 app.use(cookieParser());
 
+async function getUserinfo(userId){
+    let insertQuery = "SELECT au.id as expertId, au.*, ei.* FROM adminusers as au left outer Join expertInfo as ei on au.id = ei.usersId Where au.id = "+ userId +"";
+    await connection.query(insertQuery, async function (error, results, fields) {
+      if (error) {
+        console.log("error insert", error);
+        // res.send({ message:"error", err:error });
+      } else {
+        console.log("result ", results);
+        result =JSON.parse(JSON.stringify(results[0])); 
+        await connection.query("DELETE FROM adminusers WHERE id = '" + result.id + "'", function (error, results, fields) {
+            if (error) {
+              console.log("error insert", error);
+              // res.send({ message:"error", err:error });
+            } else {
+              console.log("result ", results);
+              result =JSON.parse(JSON.stringify(results[0])); 
+              req.body.id
+              next();
+            }
+          })
+        next();
+      }
+    });
+}
 async function updateExpertInfo(reqData, insertId, next){
     let insertQuery =
       "UPDATE expertInfo SET `skill` = '" + reqData.skill + "', " + 
@@ -284,6 +308,7 @@ app.delete('/expert/:id', async (req, res) => {
         
         // make sure that any items are correctly URL encoded in the connection string
         let result;
+        getUserinfo(userId);
         let queryStr = "DELETE FROM adminusers WHERE id = '" + userId + "'";
         await connection.query(queryStr, async function (error, results, fields) {
            +91
