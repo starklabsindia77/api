@@ -12,7 +12,8 @@ Promise.longStackTraces();
 
 const app = express();
 dotenv.config();
-app.use(cors())
+app.use(cors());
+app.set('view engine', 'ejs');
 // app.use(cors({ origin : '*'}))
 app.use(cookieParser());
 //to not get any deprecation warning or error

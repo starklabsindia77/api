@@ -23,7 +23,8 @@ const validateUserToken = require('../middlewares/verify-token');
 
 serverUrl = config.serverUrl
 
-app.use(cors())
+app.use(cors());
+app.set('view engine', 'ejs');
 //to not get any deprecation warning or error
 //support parsing of application/x-www-form-urlencoded post data
 app.use(bodyParser.json({ limit: '50mb' }));
