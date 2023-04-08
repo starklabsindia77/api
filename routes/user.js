@@ -42,7 +42,7 @@ async function insertUser(reqData, next) {
         console.log("error insert", error);
         // res.send({ message:"error", err:error });
       } else {
-        console.log("result ", results);
+        // console.log("result ", results);
         next();
       }
   

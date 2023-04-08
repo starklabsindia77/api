@@ -77,15 +77,16 @@ async function insertUser(otp, reqData) {
       console.log("error insert", error);
       // res.send({ message:"error", err:error });
     } else {
-      console.log("result ", results);
+      // console.log("result ", results);
+      updateResponse = JSON.parse(JSON.stringify(results));
+      // console.log("result error", updateResponse);
+      if (updateResponse.affectedRows == 1) {
+        let phone = reqData.mobile;
+        sendTxtMsg(phone, otp);
+      }
     }
 
-    updateResponse = JSON.parse(JSON.stringify(results));
-    console.log("result error", updateResponse);
-    if (updateResponse.affectedRows == 1) {
-      let phone = reqData.mobile;
-      sendTxtMsg(phone, otp);
-    }
+    
   });
 }
 
@@ -166,14 +167,14 @@ app.post("/otpverify", async (req, res) => {
       reqData.otp +
       "'";
 
-    console.log("string", connection);
+    // console.log("string", connection);
     await connection.query(queryStr, async function (error, results, fields) {
       if (error) {
         console.log("error", error);
         res.send({ message: "error", err: error });
       } else if (results.length > 0) {
         result = JSON.parse(JSON.stringify(results[0]));
-        console.log("result", result);
+        // console.log("result", result);
         // await updateOTP(result.id, otp, phone);
         token = jwt.sign({ user: result.mobileNo }, config.SECRET, {
           expiresIn: tokenExpireTime,
