@@ -53,7 +53,7 @@ module.exports = function(req, res, next) {
               console.log('Error uploading file:', err);
             } else {
               console.log('File uploaded successfully:', data.Location);
-              if(req.body?.avatarUrl){
+              if(req.body.avatarUrl){
                 req.body.avatarUrl = data.Location;
               }else{
                 req.body.photoURL = data.Location;
