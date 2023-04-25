@@ -68,7 +68,7 @@ app.post("/login", async (req, res) => {
           data.password,
           function (err, result) {
             if (result) {
-              token = jwt.sign({ user: data.email }, config.SECRET, {
+              token = jwt.sign({ user: data }, config.SECRET, {
                 expiresIn: tokenExpireTime,
               });
               return res

@@ -169,8 +169,8 @@ app.post("/otpverify", async (req, res) => {
 
     // console.log("string", connection);
     await connection.query(queryStr, async function (error, results, fields) {
+      // console.log(error, results);
       if (error) {
-        console.log("error", error);
         res.send({ message: "error", err: error });
       } else if (results.length > 0) {
         result = JSON.parse(JSON.stringify(results[0]));

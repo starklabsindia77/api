@@ -11,10 +11,17 @@ module.exports = {
     TWILIO_AUTH_TOKEN:"6924014f902c3fafb6df8f40f4e859c2",
     TWILIO_PHONE_NUMBER:"",
     TWIML_SERVER_URL:"https://www.example.org/twiml/",
-    host     : 'astrodbnew.cfhotb0aool1.ap-south-1.rds.amazonaws.com',
-    user     : 'admin',
-    password : 'Baba1234',
+    // host     : 'astrodbnew.cfhotb0aool1.ap-south-1.rds.amazonaws.com',
+    // user     : 'admin',
+    // password : 'Baba1234',
+    // port: '3306',
+    // database : 'databaseAstro'
+
+    host     : 'localhost',
+    user     : 'root',
+    password : '',
     port: '3306',
-    database : 'databaseAstro'
+    database : 'databaseastro'
+
    
 }

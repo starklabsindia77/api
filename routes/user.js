@@ -200,7 +200,6 @@ app.delete('/user/:id', async (req, res) => {
         let result;
         let queryStr = "DELETE FROM users WHERE id = '" + userId + "'";
         await connection.query(queryStr, async function (error, results, fields) {
-           +91
             if (error){
                 // console.log("error", error);
                 res.send({ message:"error", err:error });

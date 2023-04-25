@@ -249,7 +249,7 @@ app.put('/expert/:id', upload, async (req, res, next) => {
             const hashedPassword = await bcrypt.hash(reqData.password, salt);
             queryStr = "UPDATE adminusers SET firstName = '"+ reqData.firstName + "'," +
         "lastName = '"+ reqData.lastName + "', " + 
-        "displayName = '"+reqData.firstName + + reqData.lastName + "'," +
+        "displayName = '" + reqData.firstName + ' ' + reqData.lastName + "'," +
         "email = '"+ reqData.email + "', " +
         "password = '"+ hashedPassword + "', " +
         "mobileNo = '"+ reqData.mobileNo + "', " +
@@ -266,7 +266,7 @@ app.put('/expert/:id', upload, async (req, res, next) => {
         }else{
             queryStr = "UPDATE adminusers SET firstName = '"+ reqData.firstName + "'," +
         "lastName = '"+ reqData.lastName + "', " + 
-        "displayName = '"+reqData.firstName + ' ' + reqData.lastName + "'," +
+        "displayName = '" + reqData.firstName + ' ' + reqData.lastName + "'," +
         "email = '"+ reqData.email + "', " +
         "mobileNo = '"+ reqData.mobileNo + "', " +
         "photoURL = '"+ reqData.photoURL + "', " +
@@ -281,9 +281,58 @@ app.put('/expert/:id', upload, async (req, res, next) => {
         }
         
         
-        // console.log("string", queryStr);
+        console.log("string", queryStr);
         await connection.query(queryStr, async function (error, results, fields) {
-            console.log(error, results);
+            // console.log(error, results);
+            if (error){
+                // console.log("error", error);
+                res.send({ message:"error", err:error });
+            }else{
+                updateExpertInfo(reqData, reqData.id, next);          
+                res.send({ message: "user is updated", success: true});
+                
+            }            
+        });
+    } catch (err) {
+        // ... error checks
+        console.log("errornew", err);
+        res.send(err);
+    }
+});
+
+
+app.put('/expertUpdate/:id', upload, async (req, res, next) => {
+    let userId = req.params.id
+    let reqData = req.body;
+    console.log("req", reqData);
+    try {
+        // make sure that any items are correctly URL encoded in the connection string     
+        if(reqData.status === 'active'){
+            reqData.status = 0;
+        }else{
+            reqData.status = 1;
+        }
+        reqData.firstName = reqData.displayName.split(' ')[0];
+        reqData.lastName = reqData.displayName.split(' ')[1];
+            queryStr = "UPDATE adminusers SET firstName = '"+ reqData.firstName + "'," +
+        "lastName = '"+ reqData.lastName + "', " + 
+        "displayName = '" + reqData.displayName + "'," +
+        "email = '"+ reqData.email + "', " +
+        "mobileNo = '"+ reqData.mobileNo + "', " +
+        "photoURL = '"+ reqData.photoURL + "', " +
+        "address = '"+ reqData.address + "', " +
+        "city = '"+ reqData.city + "', " +
+        "zipCode = '"+ reqData.zipCode + "', " +
+        "country = '"+ reqData.country + "', " +
+        "state = '"+ reqData.state + "', " +
+        "isVerified = "+ reqData.isVerified + ", " +
+        "updatedAt = '"+ new Date().toJSON().slice(0, 19).replace('T', ' ') + "', " +
+        "status = '"+ reqData.status + "' WHERE id = "+ userId +";"
+        
+        
+        console.log("string", queryStr);
+        await connection.query(queryStr, async function (error, results, fields) {
+            // console.log(error, results);
             if (error){
                 // console.log("error", error);
                 res.send({ message:"error", err:error });

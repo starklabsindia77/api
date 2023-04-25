@@ -28,7 +28,8 @@ app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 const userRoutes = require("./routes/user");
 const expertRoutes = require("./routes/expert");
 const adminRoutes = require("./routes/adminauth");
-// const wishRoutes = require("./api/wishlist");
+const sessionsRoutes = require("./routes/sessions");
+const slotsRoutes = require("./routes/slot");
 // const roleRoutes = require("./api/role");
 const authRoutes = require("./routes/auth");
 // const applicationRoutes = require("./api/application");
@@ -36,6 +37,8 @@ const authRoutes = require("./routes/auth");
 
 app.use("/api/admin", userRoutes);
 app.use("/api/admin", expertRoutes);
+app.use("/api/admin", sessionsRoutes);
+app.use("/api", slotsRoutes);
 // app.use("/api", universityRoutes);
 // app.use("/api", wishRoutes);
 // app.use("/api", roleRoutes);
