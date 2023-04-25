@@ -42,11 +42,13 @@ app.get('/slots/:id/:date', async (req, res) => {
         let queryStr;
         
         let date = new Date(req.params.date);
+       
 
         queryStr = `SELECT * FROM expert_slot WHERE expert_Id = ${req.params.id} AND date = ${JSON.stringify(date)};`
         
         
         await connection.query(queryStr, async function (error, results, fields) {
+            
             if (error){
                 // console.log("error", error);
                 res.send({ message:"error", err:error });

@@ -40,25 +40,25 @@ app.post('/appointment', async (req, res) => {
         // make sure that any items are correctly URL encoded in the connection string     
         let result;
         let queryStr;
+        let reqData = req.body;
         
         let date = new Date();
+        
 
-        queryStr = `INSERT INTO appointment ( 
-            expert_Id, user_id, start_time, end_time, date, payment_status, booking_status, created_at, updated_at ) 
-            VALUES ('[value-2]','[value-3]','[value-4]','[value-5]','[value-6]','[value-7]','[value-8]','[value-9]','[value-10]')`
+
+        queryStr = `INSERT INTO appointment ( expert_Id, user_id, start_time, end_time, date, payment_status, transdetails, booking_status, overallDataJsonString, created_at, updated_at ) 
+            VALUES (${reqData.expertId},${reqData.user.id},'${reqData.startTime}','${reqData.endTime}','${reqData.date}','Done','', 'active', '${JSON.stringify(reqData)}', '${new Date().toJSON().slice(0, 19).replace('T', ' ')}', '${new Date().toJSON().slice(0, 19).replace('T', ' ')}')`;
         
-        
+            
         await connection.query(queryStr, async function (error, results, fields) {
+            console.log(error, results);
             if (error){
                 // console.log("error", error);
                 res.send({ message:"error", err:error });
-            }else if(results.length > 0 ){                
-                result =JSON.parse(JSON.stringify(results[0]));            
-                let slot = JSON.parse(result.time_slot);     
-                res.send({ status: true, data: slot});
-            }else{
-                res.send({ status: true, data: []});
-            } 
+            }else {                
+                result =JSON.parse(JSON.stringify(results));             
+                res.send({ status: true, data: result});
+            }
         });
     } catch (err) {
         // ... error checks
