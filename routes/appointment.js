@@ -18,6 +18,7 @@ var Promise = require("bluebird");
 Promise.longStackTraces();
 var cron = require('node-cron');
 const validateUserToken = require('../middlewares/verify-token');
+const verifyToken = require('../middlewares/verify-token');
 
 
 
@@ -51,7 +52,38 @@ app.post('/appointment', async (req, res) => {
         
             
         await connection.query(queryStr, async function (error, results, fields) {
-            console.log(error, results);
+            if (error){
+                // console.log("error", error);
+                res.send({ message:"error", err:error });
+            }else {                
+                result =JSON.parse(JSON.stringify(results));             
+                res.send({ status: true, data: result});
+            }
+        });
+    } catch (err) {
+        // ... error checks
+        console.log("errornew", err);
+        res.send(err);
+    }
+});
+
+
+app.get('/appointment', verifyToken, async (req, res) => {
+    try {
+        // make sure that any items are correctly URL encoded in the connection string     
+        let result;
+        let queryStr;
+        let reqData = req.body;
+        
+        let date = new Date();
+        let expert = req.decoded;
+
+
+        queryStr = `SELECT * FROM appointment as App left OUTER JOIN users as us on us.id = App.user_id Where App.expert_Id = ${expert.user.id}`;
+        
+            
+        await connection.query(queryStr, async function (error, results, fields) {
+            //console.log(error, results);
             if (error){
                 // console.log("error", error);
                 res.send({ message:"error", err:error });
