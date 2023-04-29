@@ -1,5 +1,7 @@
 var mysql      = require('mysql');
+const fs = require('fs')
 const config = require("../key");
+
 
 
 var connection = mysql.createConnection({
@@ -10,8 +12,16 @@ var connection = mysql.createConnection({
     connectionLimit: 15,
     queueLimit: 30,
     acquireTimeout: 1000000,
-    database : config.database
+    database : config.database,
+    // ssl: {
+    //     // Uncomment this section and provide the correct paths to the necessary certificates
+    //     ca: fs.readFileSync('path/to/ca-cert.pem'),
+    //     cert: fs.readFileSync('path/to/client-cert.pem'),
+    //     key: fs.readFileSync('path/to/client-key.pem'),
+    // },
   });
+
+
 
 
 connection.connect((error) => {
@@ -21,6 +31,10 @@ connection.connect((error) => {
     }
     console.log('Connected to MySQL server.');
 });
+
+
+
+// console.log('Connected to MsSQL server', connection)
 
 
 module.exports = connection;

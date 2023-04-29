@@ -14,10 +14,10 @@ module.exports = {
     // password : 'Baba1234',
     // port: '3306',
     // database : 'databaseAstro'
-    host     : 'localhost',
-    user     : 'root',
-    password : '',
+    host     : 'varunnewserver.mysql.database.azure.com',
+    user     : 'adminvarun',
+    password : 'Baba@1234',
     port: '3306',
-    database : 'databaseastro'
+    database : 'databaseAstro',
 
 }

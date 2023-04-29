@@ -1,1 +1,1 @@
-module.exports = require('./connection/local');
+module.exports = require('./connection/dev');
