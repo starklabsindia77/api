@@ -107,7 +107,7 @@ app.get('/appointment/:userId', async (req, res) => {
         //console.log("test", userId);
 
 
-        queryStr = `SELECT * FROM appointment as App left OUTER JOIN adminusers as us on us.id = App.expert_id left OUTER JOIN expertinfo as ei on ei.usersId = App.expert_Id Where App.user_id = ${userId} and us.role = 'Expert'`;
+        queryStr = `SELECT * FROM appointment as App left OUTER JOIN adminusers as us on us.id = App.expert_id left OUTER JOIN expertinfo as ei on ei.usersId = App.expert_Id Where App.user_id = ${userId} and us.role = 'Expert' ORDER BY App.date DESC`;
         
             
         await connection.query(queryStr, async function (error, results, fields) {

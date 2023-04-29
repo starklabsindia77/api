@@ -178,7 +178,7 @@ app.post("/otpverify", async (req, res) => {
         token = jwt.sign({ user: userinfo.mobileNo }, config.SECRET, {
           expiresIn: tokenExpireTime,
         });
-        queryStr = `SELECT * FROM appointment as App left OUTER JOIN adminusers as us on us.id = App.expert_id left OUTER JOIN expertinfo as ei on ei.usersId = App.expert_Id Where App.user_id = ${userinfo.id} and us.role = 'Expert' ORDER BY App.created_at DESC `;
+        queryStr = `SELECT * FROM appointment as App left OUTER JOIN adminusers as us on us.id = App.expert_id left OUTER JOIN expertinfo as ei on ei.usersId = App.expert_Id Where App.user_id = ${userinfo.id} and us.role = 'Expert' ORDER BY App.date DESC `;
         
             
         await connection.query(queryStr, async function (error, results, fields) {
@@ -211,7 +211,7 @@ app.post("/otpverify", async (req, res) => {
                   success: true,
                   token: token,
                   user: userinfo,
-                  myApp: pastApp
+                  myApp: myApp
                 });
             }
         });
