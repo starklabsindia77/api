@@ -55,6 +55,11 @@ app.use(function (req, res, next) {
   next(createError(404));
 });
 
+app.get("/", function (req, res, next) {
+
+  res.send({ message: "working test" })
+})
+
 // error handler
 // app.use(function (err, req, res, next) {
 //   res.locals.message = err.message;
