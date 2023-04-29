@@ -130,6 +130,14 @@ app.get('/appointment/:userId', async (req, res) => {
                     return date > currentDate;
                 });
 
+                const myApp = result.filter((dateString) => {
+                    const date = new Date(dateString.date);
+                    date.setHours(0, 0, 0, 0);
+
+                    // Check if the date is greater than or equal to the current date
+                    return date >= currentDate;
+                });
+
                 const pastApp = result.filter((dateString) => {
                    const date = new Date(dateString.date);
                    date.setHours(0, 0, 0, 0);
@@ -145,11 +153,9 @@ app.get('/appointment/:userId', async (req, res) => {
                    // Check if the date is greater than or equal to the current date
                    return date == currentDate;
                 });
-
-
                 
                 // console.log("length",upcomingApp.length, pastApp.length, TodayApp.length);
-                res.send({ status: true, data: result, upcomingApp: upcomingApp, pastApp: pastApp, todayApp: TodayApp });
+                res.send({ status: true, data: result, upcomingApp: upcomingApp, pastApp: pastApp, todayApp: TodayApp, myApp: myApp});
             }
         });
     } catch (err) {

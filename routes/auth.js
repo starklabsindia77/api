@@ -159,6 +159,7 @@ app.post("/otpverify", async (req, res) => {
     // make sure that any items are correctly URL encoded in the connection string
 
     let result;
+    let userinfo;
     let token;
     let queryStr =
       "SELECT * FROM users WHERE mobileNo = '" +
@@ -173,19 +174,41 @@ app.post("/otpverify", async (req, res) => {
       if (error) {
         res.send({ message: "error", err: error });
       } else if (results.length > 0) {
-        result = JSON.parse(JSON.stringify(results[0]));
-        // console.log("result", result);
-        // await updateOTP(result.id, otp, phone);
-        token = jwt.sign({ user: result.mobileNo }, config.SECRET, {
+        userinfo = JSON.parse(JSON.stringify(results[0]));
+        token = jwt.sign({ user: userinfo.mobileNo }, config.SECRET, {
           expiresIn: tokenExpireTime,
         });
+        queryStr = `SELECT * FROM appointment as App left OUTER JOIN adminusers as us on us.id = App.expert_id left OUTER JOIN expertinfo as ei on ei.usersId = App.expert_Id Where App.user_id = ${userinfo.id} and us.role = 'Expert' ORDER BY App.created_at DESC `;
+        
+            
+        await connection.query(queryStr, async function (error, results, fields) {
+            //console.log(error, results);
+            if (error){
+                // console.log("error", error);
+                res.send({ message:"error", err:error });
+            }else {                
+                result =JSON.parse(JSON.stringify(results)); 
+                const currentDate = new Date();
+                currentDate.setHours(0, 0, 0, 0);
+                // Filter the dateArray based on the current date
+                const myApp = result.filter((dateString) => {
+                    const date = new Date(dateString.date);
+                    date.setHours(0, 0, 0, 0);
+                    // Check if the date is greater than or equal to the current date
+                    return date >= currentDate;
+                });
 
-        res.send({
-          message: "Otp Verifed",
-          success: true,
-          token: token,
-          user: result,
+                res.send({
+                  message: "Otp Verifed",
+                  success: true,
+                  token: token,
+                  user: userinfo,
+                  myApp: myApp
+                });
+            }
         });
+
+        
       } else {
         console.log("Otp Verifed", results);
         res.send({ message: "user does't exist" });
