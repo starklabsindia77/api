@@ -191,27 +191,14 @@ app.post("/otpverify", async (req, res) => {
                 const currentDate = new Date();
                 currentDate.setHours(0, 0, 0, 0);
                 // Filter the dateArray based on the current date
-                const myApp = result.filter((dateString) => {
-                    const date = new Date(dateString.date);
-                    date.setHours(0, 0, 0, 0);
-                    // Check if the date is greater than or equal to the current date
-                    return date >= currentDate;
-                });
-
-                const pastApp = result.filter((dateString) => {
-                    const date = new Date(dateString.date);
-                    date.setHours(0, 0, 0, 0);
-
-                    // Check if the date is greater than or equal to the current date
-                    return date < currentDate;
-                });
+                
+                
 
                 res.send({
                   message: "Otp Verifed",
                   success: true,
                   token: token,
                   user: userinfo,
-                  myApp: myApp
                 });
             }
         });
