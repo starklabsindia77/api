@@ -129,6 +129,8 @@ app.put('/user/profile', async (req, res) => {
   let queryStr = "UPDATE users SET firstName = '"+ reqData.firstName + "'," +
       "lastName = '"+ reqData.lastName + "', " + 
       "name = '"+ reqData.name + "'," +
+      "dob = '"+ reqData.dob + "', " +
+      "gender = '"+ reqData.gender + "', " +
       "email = '"+ reqData.email + "', " +
       "address = '"+ reqData.address + "', " +
       "city = '"+ reqData.city + "', " +
@@ -139,7 +141,7 @@ app.put('/user/profile', async (req, res) => {
 
       try {
           await connection.query(queryStr, async function (error, results, fields) {
-              // console.log(error, results);
+              console.log(error, results);
               if (error){
                   // console.log("error", error);
                   res.send({ message:"error", err:error });
@@ -202,9 +204,8 @@ app.post("/otpverify", async (req, res) => {
       reqData.otp +
       "'";
 
-    // console.log("string", connection);
+    
     await connection.query(queryStr, async function (error, results, fields) {
-      // console.log(error, results);
       if (error) {
         res.send({ message: "error", err: error });
       } else if (results.length > 0) {
@@ -240,7 +241,7 @@ app.post("/otpverify", async (req, res) => {
         
       } else {
         console.log("Otp Verifed", results);
-        res.send({ message: "user does't exist" });
+        res.send({ message: "OTP is Wrong" });
       }
     });
   } catch (err) {
