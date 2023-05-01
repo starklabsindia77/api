@@ -122,6 +122,40 @@ app.post("/login", async (req, res) => {
   }
 });
 
+app.put('/user/profile', async (req, res) => {
+  let reqData = req.body;
+  console.log("data", reqData);
+
+  let queryStr = "UPDATE users SET firstName = '"+ reqData.firstName + "'," +
+      "lastName = '"+ reqData.lastName + "', " + 
+      "name = '"+ reqData.name + "'," +
+      "email = '"+ reqData.email + "', " +
+      "address = '"+ reqData.address + "', " +
+      "city = '"+ reqData.city + "', " +
+      "zipCode = '"+ reqData.zipCode + "', " +
+      "country = '"+ reqData.country + "', " +
+      "updatedAt = '"+ new Date().toJSON().slice(0, 19).replace('T', ' ') + "', " +
+      "status = '"+ reqData.status + "' WHERE id = "+ reqData.id +";"
+
+      try {
+          await connection.query(queryStr, async function (error, results, fields) {
+              // console.log(error, results);
+              if (error){
+                  // console.log("error", error);
+                  res.send({ message:"error", err:error });
+              }else{
+                  res.send({ message: "user is updated", success: true, data:reqData});
+              }            
+          });
+
+      }catch (err) {
+          // ... error checks
+          console.log("errornew", err);
+          res.send(err);
+      }
+      
+})
+
 app.post("/register", async (req, res) => {
   let reqData = req.body;
   try {
