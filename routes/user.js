@@ -142,6 +142,7 @@ app.post('/user', upload, async(req, res, next) => {
 
 app.put('/user/profile', async (req, res) => {
     let reqData = req.body;
+    console.log("data", reqData);
 
     let queryStr = "UPDATE users SET firstName = '"+ reqData.firstName + "'," +
         "lastName = '"+ reqData.lastName + "', " + 
