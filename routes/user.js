@@ -140,6 +140,44 @@ app.post('/user', upload, async(req, res, next) => {
     }
 });
 
+app.put('/user/profile', async (req, res) => {
+    let reqData = req.body;
+
+    let queryStr = "UPDATE users SET firstName = '"+ reqData.firstName + "'," +
+        "lastName = '"+ reqData.lastName + "', " + 
+        "name = '"+ reqData.name + "'," +
+        "email = '"+ reqData.email + "', " +
+        "address = '"+ reqData.address + "', " +
+        "city = '"+ reqData.city + "', " +
+        "zipCode = '"+ reqData.zipCode + "', " +
+        "country = '"+ reqData.country + "', " +
+        "updatedAt = '"+ new Date().toJSON().slice(0, 19).replace('T', ' ') + "', " +
+        "status = '"+ reqData.status + "' WHERE id = "+ reqData.id +";"
+
+        try {
+            await connection.query(queryStr, async function (error, results, fields) {
+                // console.log(error, results);
+                if (error){
+                    // console.log("error", error);
+                    res.send({ message:"error", err:error });
+                }else if(results.length > 0 ){
+                    console.log("test 1");
+                    result =JSON.parse(JSON.stringify(results[0]));           
+                    res.send({ message: "user is updated", success: true, data:result});
+                }else{
+                    console.log("test 2");
+                    res.send({ message: "user does't exist",  });
+                }            
+            });
+
+        }catch (err) {
+            // ... error checks
+            console.log("errornew", err);
+            res.send(err);
+        }
+        
+})
+
 // update single user 
 app.put('/user/:id', upload, async (req, res) => {
     let userId = req.params.id
