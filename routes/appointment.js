@@ -117,8 +117,8 @@ app.get('/appointment/:userId', async (req, res) => {
                 res.send({ message:"error", err:error });
             }else {                
                 result =JSON.parse(JSON.stringify(results)); 
-                //const currentDate = new Date('2023-04-28T00:00:00.000Z');
-                const currentDate = new Date();
+                const currentDate = new Date('2023-04-26T00:00:00.000Z');
+                // const currentDate = new Date();
                 currentDate.setHours(0, 0, 0, 0);
 
                 // Filter the dateArray based on the current date
