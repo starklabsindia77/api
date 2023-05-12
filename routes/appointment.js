@@ -73,10 +73,14 @@ app.get('/appointment', verifyToken, async (req, res) => {
         // make sure that any items are correctly URL encoded in the connection string     
         let result;
         let queryStr;
-        let expert = req.decoded;
+        let expert = req.decoded.user;
 
-
-        queryStr = `SELECT * FROM appointment as App left OUTER JOIN users as us on us.id = App.user_id Where App.expert_Id = ${expert.user.id}`;
+        if(expert.role !== 'Admin'){
+            queryStr = `SELECT * FROM appointment as App left OUTER JOIN users as us on us.id = App.user_id Where App.expert_Id = ${expert.id}`;
+        }else{
+            queryStr = `SELECT * FROM appointment as App left OUTER JOIN users as us on us.id = App.user_id left Outer Join adminusers as au on au.id = App.expert_Id `;
+        }
+        
         
             
         await connection.query(queryStr, async function (error, results, fields) {

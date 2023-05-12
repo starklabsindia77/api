@@ -13,12 +13,7 @@ var connection = mysql.createConnection({
     queueLimit: 30,
     acquireTimeout: 1000000,
     database : config.database,
-    // ssl: {
-    //     // Uncomment this section and provide the correct paths to the necessary certificates
-    //     ca: fs.readFileSync('path/to/ca-cert.pem'),
-    //     cert: fs.readFileSync('path/to/client-cert.pem'),
-    //     key: fs.readFileSync('path/to/client-key.pem'),
-    // },
+   
   });
 
 

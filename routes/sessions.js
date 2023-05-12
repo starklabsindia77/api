@@ -133,21 +133,19 @@ app.get('/sessions', verify,  async (req, res) => {
         // make sure that any items are correctly URL encoded in the connection string     
         let result;
         let queryStr;
-        if(req.decoded.role !== 'Admin'){
+        if(req.decoded.user.role !== 'Admin'){
             queryStr = `SELECT * FROM sessions WHERE expert_Id = ${req.decoded.user.id}`;
         }else{
-            queryStr = "SELECT * FROM sessions ";
+            queryStr = "SELECT * FROM sessions as s left outer join adminusers as au on au.id = s.expert_Id";
         }
         
-        
+        // console.log("query", queryStr, req.decoded);
         await connection.query(queryStr, async function (error, results, fields) {
-            // console.log(error, results, fields)
             if (error){
                 // console.log("error", error);
                 res.send({ message:"error", err:error });
             }else if(results.length > 0 ){                
-                result =JSON.parse(JSON.stringify(results[0]));                
-                // await updateOTP(result.id, otp, phone);     
+                result =JSON.parse(JSON.stringify(results[0]));               
                 res.send({ status: true, data: results});
             }else{
                 res.send({ status: true, data: []});
