@@ -26,6 +26,7 @@ app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 
 const userRoutes = require("./routes/user");
+const dashboardRoutes = require("./routes/dashboard");
 const expertRoutes = require("./routes/expert");
 const adminRoutes = require("./routes/adminauth");
 const sessionsRoutes = require("./routes/sessions");
@@ -38,6 +39,7 @@ const authRoutes = require("./routes/auth");
 // const ProfileRoutes = require("./api/profile");
 
 app.use("/api/admin", userRoutes);
+app.use("/api/admin", dashboardRoutes);
 app.use("/api/admin", expertRoutes);
 app.use("/api/admin", sessionsRoutes);
 app.use("/api", slotsRoutes);
