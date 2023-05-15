@@ -203,9 +203,10 @@ app.post("/otpverify", async (req, res) => {
       "' and otp = '" +
       reqData.otp +
       "'";
-
+    console.log("qury", queryStr);
     
     await connection.query(queryStr, async function (error, results, fields) {
+      console.log("res", results);
       if (error) {
         res.send({ message: "error", err: error });
       } else if (results.length > 0) {
