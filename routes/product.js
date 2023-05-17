@@ -1,7 +1,7 @@
 
-var connection = require('../middlewares/database');
-var upload = require('../middlewares/upload');
-var verify = require('../middlewares/verify-token');
+// var connection = require('../middlewares/database');
+// var upload = require('../middlewares/upload');
+// var verify = require('../middlewares/verify-token');
 const express = require("express");
 const app = express();
 const cors = require('cors')
