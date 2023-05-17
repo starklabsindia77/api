@@ -89,8 +89,35 @@ const mockProducts = [
   ];
   
   // Define the GET API for products
-  app.get('/products', (req, res) => {
-    res.send({ status: true, data: mockProducts});
+  app.get('/products', async  (req, res) => {
+
+    try {
+        // make sure that any items are correctly URL encoded in the connection string     
+        let result;
+        let queryStr;
+        // let expert = req.decoded.user;
+
+        
+        queryStr = `SELECT * FROM products`;
+        
+        
+            
+        await connection.query(queryStr, async function (error, results, fields) {
+            //console.log(error, results);
+            if (error){
+                // console.log("error", error);
+                res.send({ message:"error", err:error });
+            }else {                
+                result =JSON.parse(JSON.stringify(results));             
+                res.send({ status: true, data: result});
+            }
+        });
+    } catch (err) {
+        // ... error checks
+        console.log("errornew", err);
+        res.send(err);
+    }
+    // res.send({ status: true, data: mockProducts});
   });
 
 
