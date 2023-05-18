@@ -120,5 +120,38 @@ const mockProducts = [
     // res.send({ status: true, data: mockProducts});
   });
 
+  app.post('/products', async (req, res) => {
+    const { title, description, star, sold, price, icon } = req.body;
+    try {
+        const [rows, fields] = await connection.query('INSERT INTO Products (title, description, star, sold, price, icon) VALUES (?, ?, ?, ?, ?, ?)', [title, description, star, sold, price, icon]);
+        res.status(201).json({ message: "Product created successfully" });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+// Update product
+app.put('/products/:id', async (req, res) => {
+    const { title, description, star, sold, price, icon } = req.body;
+    const { id } = req.params;
+    try {
+        const [rows, fields] = await connection.query('UPDATE Products SET title = ?, description = ?, star = ?, sold = ?, price = ?, icon = ? WHERE id = ?', [title, description, star, sold, price, icon, id]);
+        res.json({ message: "Product updated successfully" });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+// Delete product
+app.delete('/products/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const [rows, fields] = await connection.query('DELETE FROM Products WHERE id = ?', [id]);
+        res.json({ message: "Product deleted successfully" });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
 
 module.exports = app;
