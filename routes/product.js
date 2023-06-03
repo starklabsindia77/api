@@ -1,7 +1,7 @@
 
-// var connection = require('../middlewares/database');
-// var upload = require('../middlewares/upload');
-// var verify = require('../middlewares/verify-token');
+var connection = require('../middlewares/database');
+var upload = require('../middlewares/upload');
+var verify = require('../middlewares/verify-token');
 const express = require("express");
 const app = express();
 const cors = require('cors')
@@ -103,7 +103,7 @@ const mockProducts = [
         
             
         await connection.query(queryStr, async function (error, results, fields) {
-            //console.log(error, results);
+            // console.log(error, results);
             if (error){
                 // console.log("error", error);
                 res.send({ message:"error", err:error });
