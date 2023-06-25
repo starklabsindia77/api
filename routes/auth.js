@@ -91,6 +91,7 @@ async function insertUser(otp, reqData) {
 }
 
 app.post("/login", async (req, res) => {
+  console.log("test1");
   let reqData = req.body;
   try {
     // make sure that any items are correctly URL encoded in the connection string
