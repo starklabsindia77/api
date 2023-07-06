@@ -34,82 +34,86 @@ app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 // support parsing of application/json type post data
 app.use(cookieParser());
 
-async function getUserinfo(userId){
-    let insertQuery = "SELECT au.id as expertId, au.*, ei.* FROM adminusers as au left outer Join expertInfo as ei on au.id = ei.usersId Where au.id = "+ userId +"";
+async function getUserinfo(userId, next) {
+    let insertQuery = "SELECT au.id as expertId, au.*, ei.* FROM adminusers as au left outer Join expertInfo as ei on au.id = ei.usersId Where au.id = " + userId + "";
     await connection.query(insertQuery, async function (error, results, fields) {
-      if (error) {
-        console.log("error insert", error);
-        // res.send({ message:"error", err:error });
-      } else {
-        console.log("result ", results);
-        result =JSON.parse(JSON.stringify(results[0])); 
-        await connection.query("DELETE FROM adminusers WHERE id = '" + result.id + "'", function (error, results, fields) {
-            if (error) {
-              console.log("error insert", error);
-              // res.send({ message:"error", err:error });
-            } else {
-              console.log("result ", results);
-              result =JSON.parse(JSON.stringify(results[0])); 
-              req.body.id
-              next();
-            }
-          })
-        next();
-      }
+        if (error) {
+            console.log("error insert", error);
+            // res.send({ message:"error", err:error });
+        } else {
+            console.log("DELETE 123 result ", results);
+            result = JSON.parse(JSON.stringify(results[0]));
+            await connection.query("DELETE FROM adminusers WHERE id = '" + result.id + "'", function (error, results, fields) {
+                if (error) {
+                    console.log("error insert", error);
+                    // res.send({ message:"error", err:error });
+                } else {
+                    console.log("DELETE result ", results);
+                    // result = JSON.parse(JSON.stringify(results[0]));
+                    // req.body.id
+                    next();
+                }
+            })
+
+        }
     });
 }
-async function updateExpertInfo(reqData, insertId, next){
-    let insertQuery =
-      "UPDATE expertInfo SET `skill` = '" + reqData.skill + "', " + 
-      "`bio` = '" + reqData.bio + "'," +
-      "`bookingAmount` = '200'," +     
-      "`updatedAt` = '" + new Date().toJSON().slice(0, 19).replace('T', ' ') + "' WHERE `id` = " + insertId + "";
-    await connection.query(insertQuery, function (error, results, fields) {
-      if (error) {
-        console.log("error insert", error);
-        // res.send({ message:"error", err:error });
-      } else {
-        console.log("result ", results);
-        next();
-      }
+async function updateExpertInfo(reqData, insertId, next) {
+    let sqlQuery = "UPDATE expertInfo SET skill = ?, bio = ?, bookingAmount = 200, updatedAt = ? WHERE id = ?";
+    let data = [reqData.skill, reqData.bio, new Date().toJSON().slice(0, 19).replace('T', ' '), insertId];
+    await connection.query(sqlQuery, data, function (error, results, fields) {
+        if (error) {
+            console.log("error insert", error);
+        } else {
+            console.log("result ", results);
+            next();
+        }
     });
 }
-async function insertExpertInfo(reqData, insertId, next){
+async function insertExpertInfo(reqData, insertId, next) {
     let insertQuery =
-      "INSERT INTO expertInfo ( `skill`, `bio`, `bookingAmount`, `usersId`, `createdAt`, `updatedAt`, `status`)" +
-      "VALUES (  '" + reqData.skill + "',  '" + reqData.bio + "', '200',  " + insertId + ", '" +
-      new Date().toJSON().slice(0, 19).replace('T', ' ') + "', '" + new Date().toJSON().slice(0, 19).replace('T', ' ') + "', 1)";
-    await connection.query(insertQuery, function (error, results, fields) {
-      if (error) {
-        console.log("error insert", error);
-        // res.send({ message:"error", err:error });
-      } else {
-        console.log("result ", results);
-        next();
-      }
+        "INSERT INTO expertInfo (`skill`, `bio`, `bookingAmount`, `usersId`, `createdAt`, `updatedAt`, `status`) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    let data = [
+        reqData.skill, 
+        reqData.bio, 
+        '200', 
+        insertId, 
+        new Date().toISOString().slice(0, 19).replace('T', ' '), 
+        new Date().toISOString().slice(0, 19).replace('T', ' '), 
+        1
+    ];
+    
+        await connection.query(insertQuery, data, function (error, results, fields) {
+        if (error) {
+            console.log("error insert", error);
+            // res.send({ message:"error", err:error });
+        } else {
+            console.log("result ", results);
+            next();
+        }
     });
 }
 async function insertExpert(reqData, next) {
 
-    if(!reqData.password){
+    if (!reqData.password) {
         reqData.password = "demo1234";
     }
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(reqData.password, salt);
     let insertQuery =
-      "INSERT INTO adminusers (`firstName`,`lastName`, `displayName`, `email`,`mobileNo`,`password`, `roleId`, `role`, `photoURL`, `address` ,  `city` , `zipCode` , `country` , `state` , `isVerified`, `createdAt`, `updatedAt`,`status`) VALUES ('" + 
-      reqData.firstName + "', '" + reqData.lastName + "', '" + reqData.firstName +' '+ reqData.lastName + "' , '" + reqData.email + "', '" + reqData.mobileNo + "', '" + hashedPassword + "', '3' , 'Expert', '" + reqData.photoURL + "' , '" + reqData.address + "', '" + reqData.city + "', '" + reqData.zipcode + "', '" + reqData.country + "', '" + reqData.state + "', " + reqData.isVerified + ", '" + new Date().toJSON().slice(0, 19).replace('T', ' ')  + "', '" + new Date().toJSON().slice(0, 19).replace('T', ' ') + "', '1') ";
+        "INSERT INTO adminusers (`firstName`,`lastName`, `displayName`, `email`,`mobileNo`,`password`, `roleId`, `role`, `photoURL`, `address` ,  `city` , `zipCode` , `country` , `state` , `isVerified`, `createdAt`, `updatedAt`,`status`) VALUES ('" +
+        reqData.firstName + "', '" + reqData.lastName + "', '" + reqData.firstName + ' ' + reqData.lastName + "' , '" + reqData.email + "', '" + reqData.mobileNo + "', '" + hashedPassword + "', '3' , 'Expert', '" + reqData.photoURL + "' , '" + reqData.address + "', '" + reqData.city + "', '" + reqData.zipcode + "', '" + reqData.country + "', '" + reqData.state + "', " + reqData.isVerified + ", '" + new Date().toJSON().slice(0, 19).replace('T', ' ') + "', '" + new Date().toJSON().slice(0, 19).replace('T', ' ') + "', '1') ";
     await connection.query(insertQuery, function (error, results, fields) {
-      if (error) {
-        console.log("error insert", error);
-        // res.send({ message:"error", err:error });
-      } else {
-        console.log("result ", results);
-        insertExpertInfo(reqData, results.insertId, next);
-      }
-      next();
-    //   updateResponse = JSON.parse(JSON.stringify(results));
-    //   console.log("result error", updateResponse);
+        if (error) {
+            console.log("error insert", error);
+            // res.send({ message:"error", err:error });
+        } else {
+            console.log("result ", results);
+            insertExpertInfo(reqData, results.insertId, next);
+        }
+        next();
+        //   updateResponse = JSON.parse(JSON.stringify(results));
+        //   console.log("result error", updateResponse);
     });
 }
 
@@ -124,20 +128,20 @@ app.get('/expert', async (req, res) => {
         let result;
         //let queryStr = "SELECT * FROM adminusers WHERE role = 'Expert' ";
         let queryStr = "SELECT au.id as expertId, au.*, ei.* FROM adminusers as au left outer Join expertInfo as ei on au.id = ei.usersId WHERE au.role = 'Expert'";
-        
+
         await connection.query(queryStr, async function (error, results, fields) {
-            
-            if (error){
+
+            if (error) {
                 // console.log("error", error);
-                res.send({ message:"error", err:error });
-            }else if(results.length > 0 ){
-                
+                res.send({ message: "error", err: error });
+            } else if (results.length > 0) {
+
                 // result =JSON.parse(JSON.stringify(results[0]));                
                 // await updateOTP(result.id, otp, phone);     
-                res.send({ status: true, user: results});
-            }else{
-                res.send({ status: true, data: []});
-            } 
+                res.send({ status: true, user: results });
+            } else {
+                res.send({ status: true, data: [] });
+            }
         });
     } catch (err) {
         // ... error checks
@@ -145,26 +149,26 @@ app.get('/expert', async (req, res) => {
         res.send(err);
     }
 });
-app.get('/expertsingle', validateUserToken , async (req, res) => {
+app.get('/expertsingle', validateUserToken, async (req, res) => {
     try {
         // make sure that any items are correctly URL encoded in the connection string     
         let result;
         console.log(req.decoded)
         let queryStr = "SELECT * FROM adminusers";
-        
+
         await connection.query(queryStr, async function (error, results, fields) {
-            
-            if (error){
+
+            if (error) {
                 // console.log("error", error);
-                res.send({ message:"error", err:error });
-            }else if(results.length > 0 ){
-                
+                res.send({ message: "error", err: error });
+            } else if (results.length > 0) {
+
                 // result =JSON.parse(JSON.stringify(results[0]));                
                 // await updateOTP(result.id, otp, phone);     
-                res.send({ status: true, user: results});
-            }else{
-                res.send({ status: true, data: []});
-            } 
+                res.send({ status: true, user: results });
+            } else {
+                res.send({ status: true, data: [] });
+            }
         });
     } catch (err) {
         // ... error checks
@@ -180,19 +184,19 @@ app.get('/expert/:id', async (req, res) => {
     try {
         // make sure that any items are correctly URL encoded in the connection string       
         let result;
-        let queryStr = "SELECT au.id as expertId, au.*, ei.* FROM adminusers as au left outer Join expertInfo as ei on au.id = ei.usersId Where au.id = '"+ userId +"'";
-        
+        let queryStr = "SELECT au.id as expertId, au.*, ei.* FROM adminusers as au left outer Join expertInfo as ei on au.id = ei.usersId Where au.id = '" + userId + "'";
+
         await connection.query(queryStr, async function (error, results, fields) {
-            if (error){
+            if (error) {
                 // console.log("error", error);
-                res.send({ message:"error", err:error });
-            }else if(results.length > 0 ){
-                result =JSON.parse(JSON.stringify(results[0]));                
+                res.send({ message: "error", err: error });
+            } else if (results.length > 0) {
+                result = JSON.parse(JSON.stringify(results[0]));
                 // await updateOTP(result.id, otp, phone);     
-                res.send({ status: true, user: result});
-            }else{
-                res.send({ status: true, data: []});
-            } 
+                res.send({ status: true, user: result });
+            } else {
+                res.send({ status: true, data: [] });
+            }
         });
     } catch (err) {
         // ... error checks
@@ -203,26 +207,26 @@ app.get('/expert/:id', async (req, res) => {
 
 
 // insert single user
-app.post('/expert', upload, async(req, res, next) => {
+app.post('/expert', upload, async (req, res, next) => {
     let reqData = req.body;
     try {
         // make sure that any items are correctly URL encoded in the connection string
-       
+
         let result;
         let queryStr = "SELECT * FROM adminusers WHERE mobileNo = '" + reqData.mobile + "'";
-        
+
         await connection.query(queryStr, async function (error, results, fields) {
-            if (error){
+            if (error) {
                 // console.log("error", error);
-                res.send({ message:"error", err:error });
-            }else if(results.length > 0 ){
-                result =JSON.parse(JSON.stringify(results[0]));
-                res.send({ message: "Expert Already exist try login "});
-            }else{
+                res.send({ message: "error", err: error });
+            } else if (results.length > 0) {
+                result = JSON.parse(JSON.stringify(results[0]));
+                res.send({ message: "Expert Already exist try login " });
+            } else {
                 await insertExpert(reqData, next);
-                res.send({ message: "OTP Send Succesfully",  });
-            }            
-        });          
+                res.send({ message: "Expert created successfully!" });
+            }
+        });
     } catch (err) {
         // ... error checks
         console.log("errornew", err);
@@ -237,61 +241,61 @@ app.put('/expert/:id', upload, async (req, res, next) => {
     console.log("req", reqData);
     try {
         // make sure that any items are correctly URL encoded in the connection string     
-        if(reqData.status === 'active'){
+        if (reqData.status === 'active') {
             reqData.status = 0;
-        }else{
+        } else {
             reqData.status = 1;
         }
         let result;
         let queryStr;
-        if(reqData.password){           
+        if (reqData.password) {
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(reqData.password, salt);
-            queryStr = "UPDATE adminusers SET firstName = '"+ reqData.firstName + "'," +
-        "lastName = '"+ reqData.lastName + "', " + 
-        "displayName = '" + reqData.firstName + ' ' + reqData.lastName + "'," +
-        "email = '"+ reqData.email + "', " +
-        "password = '"+ hashedPassword + "', " +
-        "mobileNo = '"+ reqData.mobileNo + "', " +
-        "photoURL = '"+ reqData.photoURL + "', " +
-        "address = '"+ reqData.address + "', " +
-        "city = '"+ reqData.city + "', " +
-        "zipCode = '"+ reqData.zipCode + "', " +
-        "country = '"+ reqData.country + "', " +
-        "state = '"+ reqData.state + "', " +
-        "isVerified = "+ reqData.isVerified + ", " +
-        "updatedAt = '"+ new Date().toJSON().slice(0, 19).replace('T', ' ') + "', " +
-        "status = '"+ reqData.status + "' WHERE id = "+ userId +";"
+            queryStr = "UPDATE adminusers SET firstName = '" + reqData.firstName + "'," +
+                "lastName = '" + reqData.lastName + "', " +
+                "displayName = '" + reqData.firstName + ' ' + reqData.lastName + "'," +
+                "email = '" + reqData.email + "', " +
+                "password = '" + hashedPassword + "', " +
+                "mobileNo = '" + reqData.mobileNo + "', " +
+                "photoURL = '" + reqData.photoURL + "', " +
+                "address = '" + reqData.address + "', " +
+                "city = '" + reqData.city + "', " +
+                "zipCode = '" + reqData.zipCode + "', " +
+                "country = '" + reqData.country + "', " +
+                "state = '" + reqData.state + "', " +
+                "isVerified = " + reqData.isVerified + ", " +
+                "updatedAt = '" + new Date().toJSON().slice(0, 19).replace('T', ' ') + "', " +
+                "status = '" + reqData.status + "' WHERE id = " + userId + ";"
 
-        }else{
-            queryStr = "UPDATE adminusers SET firstName = '"+ reqData.firstName + "'," +
-        "lastName = '"+ reqData.lastName + "', " + 
-        "displayName = '" + reqData.firstName + ' ' + reqData.lastName + "'," +
-        "email = '"+ reqData.email + "', " +
-        "mobileNo = '"+ reqData.mobileNo + "', " +
-        "photoURL = '"+ reqData.photoURL + "', " +
-        "address = '"+ reqData.address + "', " +
-        "city = '"+ reqData.city + "', " +
-        "zipCode = '"+ reqData.zipCode + "', " +
-        "country = '"+ reqData.country + "', " +
-        "state = '"+ reqData.state + "', " +
-        "isVerified = "+ reqData.isVerified + ", " +
-        "updatedAt = '"+ new Date().toJSON().slice(0, 19).replace('T', ' ') + "', " +
-        "status = '"+ reqData.status + "' WHERE id = "+ userId +";"
+        } else {
+            queryStr = "UPDATE adminusers SET firstName = '" + reqData.firstName + "'," +
+                "lastName = '" + reqData.lastName + "', " +
+                "displayName = '" + reqData.firstName + ' ' + reqData.lastName + "'," +
+                "email = '" + reqData.email + "', " +
+                "mobileNo = '" + reqData.mobileNo + "', " +
+                "photoURL = '" + reqData.photoURL + "', " +
+                "address = '" + reqData.address + "', " +
+                "city = '" + reqData.city + "', " +
+                "zipCode = '" + reqData.zipCode + "', " +
+                "country = '" + reqData.country + "', " +
+                "state = '" + reqData.state + "', " +
+                "isVerified = " + reqData.isVerified + ", " +
+                "updatedAt = '" + new Date().toJSON().slice(0, 19).replace('T', ' ') + "', " +
+                "status = '" + reqData.status + "' WHERE id = " + userId + ";"
         }
-        
-        
-        console.log("string", queryStr);
+
+
+
         await connection.query(queryStr, async function (error, results, fields) {
             // console.log(error, results);
-            if (error){
+            if (error) {
                 // console.log("error", error);
-                res.send({ message:"error", err:error });
-            }else{
-                updateExpertInfo(reqData, reqData.id, next);          
-                res.send({ message: "user is updated", success: true});
-                
-            }            
+                res.send({ message: "error", err: error });
+            } else {
+                updateExpertInfo(reqData, reqData.id, next);
+                res.send({ message: "user is updated", success: true });
+
+            }
         });
     } catch (err) {
         // ... error checks
@@ -307,40 +311,40 @@ app.put('/expertUpdate/:id', upload, async (req, res, next) => {
     console.log("req", reqData);
     try {
         // make sure that any items are correctly URL encoded in the connection string     
-        if(reqData.status === 'active'){
+        if (reqData.status === 'active') {
             reqData.status = 0;
-        }else{
+        } else {
             reqData.status = 1;
         }
         reqData.firstName = reqData.displayName.split(' ')[0];
         reqData.lastName = reqData.displayName.split(' ')[1];
-            queryStr = "UPDATE adminusers SET firstName = '"+ reqData.firstName + "'," +
-        "lastName = '"+ reqData.lastName + "', " + 
-        "displayName = '" + reqData.displayName + "'," +
-        "email = '"+ reqData.email + "', " +
-        "mobileNo = '"+ reqData.mobileNo + "', " +
-        "photoURL = '"+ reqData.photoURL + "', " +
-        "address = '"+ reqData.address + "', " +
-        "city = '"+ reqData.city + "', " +
-        "zipCode = '"+ reqData.zipCode + "', " +
-        "country = '"+ reqData.country + "', " +
-        "state = '"+ reqData.state + "', " +
-        "isVerified = "+ reqData.isVerified + ", " +
-        "updatedAt = '"+ new Date().toJSON().slice(0, 19).replace('T', ' ') + "', " +
-        "status = '"+ reqData.status + "' WHERE id = "+ userId +";"
-        
-        
+        queryStr = "UPDATE adminusers SET firstName = '" + reqData.firstName + "'," +
+            "lastName = '" + reqData.lastName + "', " +
+            "displayName = '" + reqData.displayName + "'," +
+            "email = '" + reqData.email + "', " +
+            "mobileNo = '" + reqData.mobileNo + "', " +
+            "photoURL = '" + reqData.photoURL + "', " +
+            "address = '" + reqData.address + "', " +
+            "city = '" + reqData.city + "', " +
+            "zipCode = '" + reqData.zipCode + "', " +
+            "country = '" + reqData.country + "', " +
+            "state = '" + reqData.state + "', " +
+            "isVerified = " + reqData.isVerified + ", " +
+            "updatedAt = '" + new Date().toJSON().slice(0, 19).replace('T', ' ') + "', " +
+            "status = '" + reqData.status + "' WHERE id = " + userId + ";"
+
+
         console.log("string", queryStr);
         await connection.query(queryStr, async function (error, results, fields) {
             // console.log(error, results);
-            if (error){
+            if (error) {
                 // console.log("error", error);
-                res.send({ message:"error", err:error });
-            }else{
-                updateExpertInfo(reqData, reqData.id, next);          
-                res.send({ message: "user is updated", success: true});
-                
-            }            
+                res.send({ message: "error", err: error });
+            } else {
+                updateExpertInfo(reqData, reqData.id, next);
+                res.send({ message: "user is updated", success: true });
+
+            }
         });
     } catch (err) {
         // ... error checks
@@ -351,28 +355,25 @@ app.put('/expertUpdate/:id', upload, async (req, res, next) => {
 
 // delete user from table
 
-app.delete('/expert/:id', async (req, res) => {
+app.delete('/expert/:id', async (req, res, next) => {
     let userId = req.params.id
     console.log('delete user', userId);
-    try {
-        
-        // make sure that any items are correctly URL encoded in the connection string
+    try {        
         let result;
-        getUserinfo(userId);
+        getUserinfo(userId, next);
         let queryStr = "DELETE FROM adminusers WHERE id = '" + userId + "'";
         await connection.query(queryStr, async function (error, results, fields) {
-           +91
-            if (error){
-                // console.log("error", error);
-                res.send({ message:"error", err:error });
-            }else if(results.length > 0 ){
-                result =JSON.parse(JSON.stringify(results[0]));                
-                      
-                res.send({ message: "user deleted", success: true, data:result});
-            }else{
-                res.send({ message: "got issue in api",  });
-            }            
-        });    
+            
+            if (error) {
+               
+                res.send({ message: "error", err: error });
+            } else if (results.length > 0) {
+                result = JSON.parse(JSON.stringify(results[0]));
+                res.send({ message: "user deleted", success: true, data: result });
+            } else {
+                res.send({ message: "got issue in api", });
+            }
+        });
     } catch (err) {
         // ... error checks
         console.log("errornew", err);

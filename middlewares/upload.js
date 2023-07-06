@@ -28,6 +28,7 @@ AWS.config.update({
 
 
 module.exports = function(req, res, next) {
+  
     try{
         const s3 = new AWS.S3();
         let reqData = req.body;
