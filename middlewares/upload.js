@@ -12,19 +12,6 @@ AWS.config.update({
 
 
 
-// const upload = multer({
-//   storage: multerS3({
-//     s3: s3,
-//     bucket: config.AWS_BUCKET_NAME,
-//     acl: "public-read",
-//     metadata: (req, file, cb) => {
-//       cb(null, { fieldName: file.fieldname });
-//     },
-//     key: (req, file, cb) => {
-//       cb(null, Date.now().toString());
-//     }
-//   })
-// });
 
 
 module.exports = function(req, res, next) {
@@ -32,7 +19,7 @@ module.exports = function(req, res, next) {
     try{
         const s3 = new AWS.S3();
         let reqData = req.body;
-        if(typeof reqData.avatarUrl === "string" || typeof reqData.photoURL === "string"){
+        if(typeof reqData.avatarUrl === "string" || typeof reqData.photoURL === "string" ){
           console.log("type of 2", typeof reqData.photoURL);
             next();
         }else{

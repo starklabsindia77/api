@@ -181,6 +181,7 @@ app.get('/expertsingle', validateUserToken, async (req, res) => {
 // admin get single users 
 app.get('/expert/:id', async (req, res) => {
     let userId = req.params.id
+    console.log("user id", userId);
     try {
         // make sure that any items are correctly URL encoded in the connection string       
         let result;

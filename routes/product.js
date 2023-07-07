@@ -1,6 +1,7 @@
 
 var connection = require('../middlewares/database');
-var upload = require('../middlewares/upload');
+var upload = require('../middlewares/uploadCloudinary');
+
 var verify = require('../middlewares/verify-token');
 const express = require("express");
 const app = express();
@@ -34,6 +35,8 @@ app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 //to get json data
 // support parsing of application/json type post data
 app.use(cookieParser());
+
+
 
 
 const mockProducts = [
@@ -120,15 +123,18 @@ const mockProducts = [
     // res.send({ status: true, data: mockProducts});
   });
 
-  app.post('/products', async (req, res) => {
-    const { title, description, star, sold, price, icon } = req.body;
-    try {
-        const [rows, fields] = await connection.query('INSERT INTO Products (title, description, star, sold, price, icon) VALUES (?, ?, ?, ?, ?, ?)', [title, description, star, sold, price, icon]);
-        res.status(201).json({ message: "Product created successfully" });
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-});
+  app.post('/products', upload, (req, res) => {
+    // let product = req.body;
+
+    // var sqlQuery = 'INSERT INTO `products` (`title`,`description`,`star`,`sold`,`price`,`icon`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?)';
+    // var values = [product.title, product.description, product.star, product.sold, product.price, product.icon, product.created_at, product.updated_at];
+
+    // connection.query(sqlQuery, values, (err, result) => {
+    //     if(err) throw err;
+    //     console.log(result);
+    //     res.send('Product inserted...');
+    // });
+  });
 
 // Update product
 app.put('/products/:id', async (req, res) => {

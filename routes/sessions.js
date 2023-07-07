@@ -134,9 +134,9 @@ app.get('/sessions', verify,  async (req, res) => {
         let result;
         let queryStr;
         if(req.decoded.user.role !== 'Admin'){
-            queryStr = `SELECT * FROM sessions WHERE expert_Id = ${req.decoded.user.id}`;
+            queryStr = `SELECT s.id as sid, s.* FROM sessions as s WHERE s.expert_Id = ${req.decoded.user.id}`;
         }else{
-            queryStr = "SELECT * FROM sessions as s left outer join adminusers as au on au.id = s.expert_Id";
+            queryStr = "SELECT s.id as sid, s.*, au.* FROM sessions as s left outer join adminusers as au on au.id = s.expert_Id";
         }
         
         // console.log("query", queryStr, req.decoded);
@@ -194,7 +194,7 @@ app.delete('/sessions/:id', async (req, res) => {
     let userId = req.params.id
     try {
         
-        // make sure that any items are correctly URL encoded in the connection string
+        // make sure that any items are correctly  URL encoded in the connection string
         
         
         let result;
