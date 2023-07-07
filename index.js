@@ -35,6 +35,7 @@ const paymentRoutes = require("./routes/payment");
 const appointmentRoutes = require("./routes/appointment");
 const productRoutes = require("./routes/product");
 const authRoutes = require("./routes/auth");
+const emailRoutes = require("./routes/sendemail");
 // const applicationRoutes = require("./api/application");
 // const ProfileRoutes = require("./api/profile");
 
@@ -46,7 +47,7 @@ app.use("/api/admin", productRoutes);
 app.use("/api", slotsRoutes);
 app.use("/api", paymentRoutes);
 app.use("/api/admin", appointmentRoutes);
-// app.use("/api", universityRoutes);
+app.use("/api/admin", emailRoutes);
 // app.use("/api", wishRoutes);
 // app.use("/api", roleRoutes);
 app.use("/api/admin", adminRoutes);

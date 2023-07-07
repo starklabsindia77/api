@@ -32,11 +32,12 @@ app.use(cookieParser());
 
 
 app.post('/send-email', async (req, res) => {
+    console.log('body', req.body)
     let { name, email, subject, message } = req.body;
   
     let mailOptions = {
-      from: email, // sender address
-      to: "astroscore1@gmail.com", // list of receivers
+      from: "astroscore1@gmail.com", // sender address
+      to: "varunps191@gmail.com", // list of receivers
       subject: subject, // Subject line
       text: `Message from: ${name}, email: ${email}\n${message}`, // plain text body
     };
@@ -45,7 +46,7 @@ app.post('/send-email', async (req, res) => {
       service: 'gmail', // use 'gmail' for Google's Gmail service
       auth: {
         user: 'astroscore1@gmail.com', // replace with your email address
-        pass: 'Baba1234' // replace with your email password
+        pass: 'Baba@1234' // replace with your email password
       }
     });
   
