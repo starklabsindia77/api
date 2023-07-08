@@ -37,16 +37,18 @@ app.post('/send-email', async (req, res) => {
   
     let mailOptions = {
       from: "astroscore1@gmail.com", // sender address
-      to: "varunps191@gmail.com", // list of receivers
+      to: "astroscore1@gmail.com", // list of receivers
       subject: subject, // Subject line
       text: `Message from: ${name}, email: ${email}\n${message}`, // plain text body
     };
   
     let transporter = nodemailer.createTransport({
-      service: 'gmail', // use 'gmail' for Google's Gmail service
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false,  // use 'gmail' for Google's Gmail service
       auth: {
-        user: 'astroscore1@gmail.com', // replace with your email address
-        pass: 'Baba@1234' // replace with your email password
+        user: 'varunps191@gmail.com', // replace with your email address
+        pass: 'degmtpicbaqefsep' // replace with your email password
       }
     });
   
