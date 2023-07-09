@@ -25,6 +25,7 @@
     "guid": "0.0.12",
     "http": "0.0.1-security",
     "http-errors": "^2.0.0",
+    "https": "^1.0.0",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
     "moment": "^2.29.1",

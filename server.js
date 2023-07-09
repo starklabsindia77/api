@@ -1,7 +1,8 @@
-var http = require("http");
+// var http = require("http");
+const https = require('https');
 const app = require('./index');
 
-var httpServer = http.createServer(app);
+// var httpServer = http.createServer(app);
 let PORT = process.env.PORT || 3001;
 
 const server = https.createServer({
