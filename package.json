@@ -38,7 +38,8 @@
     "nodemailer": "^6.9.3",
     "pug": "^2.0.0-beta5",
     "serverless-http": "^2.7.0",
-    "twilio": "^2.9.2"
+    "twilio": "^2.9.2",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.15"
