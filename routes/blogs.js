@@ -121,11 +121,11 @@ app.get('/blog/posts/all', (req, res) => {
   app.put('/blogs/:id', async (req, res) => {
     try {
       const { id } = req.params;
-      const { guid, title, description, content, cover, tags, publish, comments, metaTitle, metaDescription, metaKeywords, view, comment, share, favorite, author } = req.body;
+      const { title, description, content, cover, tags, publish, comments, metaTitle, metaDescription, metaKeywords, view, comment, share, author } = req.body;
   
-      const query = `UPDATE blogs SET guid = ?, title = ?, description = ?, content = ?, cover = ?, tags = ?, publish = ?, comments = ?, metaTitle = ?, metaDescription = ?, metaKeywords = ?, view = ?, comment = ?, share = ?, favorite = ?, author = ? WHERE id = ?`;
+      const query = `UPDATE blogs SET title = ?, description = ?, content = ?, cover = ?, tags = ?, publish = ?, comments = ?, metaTitle = ?, metaDescription = ?, metaKeywords = ?, view = ?, comment = ?, share = ?, author = ? WHERE guid = ?`;
   
-      await connection.query(query, [guid, title, description, content, cover, JSON.stringify(tags), publish, comments, metaTitle, metaDescription, JSON.stringify(metaKeywords), view, comment, share, favorite, JSON.stringify(author), id]);
+      await connection.query(query, [ title, description, content, cover, JSON.stringify(tags), publish, comments, metaTitle, metaDescription, JSON.stringify(metaKeywords), view, comment, share, JSON.stringify(author), id]);
       res.status(200).json({ message: `Blog with id: ${id} updated` });
     } catch (error) {
       return res.status(500).json({ error });
