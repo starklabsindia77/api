@@ -151,9 +151,16 @@ app.put('/products/:id', async (req, res) => {
 // Delete product
 app.delete('/products/:id', async (req, res) => {
     const { id } = req.params;
+    console.log("delete ", id);
     try {
-        const [rows, fields] = await connection.query('DELETE FROM Products WHERE id = ?', [id]);
-        res.json({ message: "Product deleted successfully" });
+
+      connection.query('DELETE FROM Products WHERE id = ?', [id], (err, result) => {
+          if(err) throw err;
+          console.log(result);
+          res.send({ message: "Product deleted successfully" });
+      });
+        
+       
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
