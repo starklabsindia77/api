@@ -124,16 +124,16 @@ const mockProducts = [
   });
 
   app.post('/products', upload, (req, res) => {
-    // let product = req.body;
+    let product = req.body;
+    console.log("products", product);
+    var sqlQuery = 'INSERT INTO `products` (`title`,`description`,`star`,`sold`,`price`,`icon`,code, sku, priceSale, taxes, inStock `created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?)';
+    var values = [product.title, product.description, 4.5, 231, product.price, product.icon, product.code, product.sku, product.priceSale, product.taxes, product.inStock, product.created_at, product.updated_at];
 
-    // var sqlQuery = 'INSERT INTO `products` (`title`,`description`,`star`,`sold`,`price`,`icon`,`created_at`,`updated_at`) VALUES (?,?,?,?,?,?,?,?)';
-    // var values = [product.title, product.description, product.star, product.sold, product.price, product.icon, product.created_at, product.updated_at];
-
-    // connection.query(sqlQuery, values, (err, result) => {
-    //     if(err) throw err;
-    //     console.log(result);
-    //     res.send('Product inserted...');
-    // });
+    connection.query(sqlQuery, values, (err, result) => {
+        if(err) throw err;
+        console.log(result);
+        res.send('Product inserted...');
+    });
   });
 
 // Update product
