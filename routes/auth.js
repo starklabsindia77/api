@@ -54,7 +54,7 @@ async function updateOTP(id, otp, phone) {
   await connection.query(updateQuery, function (error, results, fields) {
     if (error) {
       console.log("error update", error);
-      // res.send({ message:"error", err:error });
+      res.send({ message:"error", err:error });
     }
     updateResponse = JSON.parse(JSON.stringify(results));
     if (updateResponse.affectedRows == 1) {
@@ -110,7 +110,7 @@ app.post("/login", async (req, res) => {
         res.send({ message: "error", err: error });
       } else if (results.length > 0) {
         result = JSON.parse(JSON.stringify(results[0]));
-        // await updateOTP(result.id, otp, phone);
+        await updateOTP(result.id, otp, phone);
         res.send({ message: "OTP Send Successfully" });
       } else {
         res.send({ message: "user does't exist" });
