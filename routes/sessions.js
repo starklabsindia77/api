@@ -2,6 +2,7 @@
 var connection = require('../middlewares/database');
 var upload = require('../middlewares/upload');
 var verify = require('../middlewares/verify-token');
+const moment = require('moment-timezone');
 const express = require("express");
 const app = express();
 const cors = require('cors')
@@ -48,40 +49,69 @@ function getNextDate(currentDate) {
     return nextDate;
 }
 
-async function getTimeSlots(startTime, endTime) {
-    const start = new Date(`${startTime}`);
-    const end = new Date(`${endTime}`);
 
-    start.setSeconds(0, 0);
-    end.setSeconds(0, 0);
-  
+
+async function getTimeSlots(startTime, endTime) {
+    const start = moment.tz(startTime, 'Asia/Kolkata');
+    const end = moment.tz(endTime, 'Asia/Kolkata');
+
+    start.startOf('minute');
+    end.startOf('minute');
+
     const timeSlots = [];
-  
-    while (start < end) {
-        const currentSlot = start.toLocaleTimeString('en-US', {
-            hour12: true,
-            hour: '2-digit',
-            minute: '2-digit',
-            
-        });
-  
-        start.setMinutes(start.getMinutes() + 15);
-        const endSlot = start.toLocaleTimeString('en-US', {
-            hour12: true,
-            hour: '2-digit',
-            minute: '2-digit',
-            
-        });
-      
+
+    while (start.isBefore(end)) {
+        const currentSlot = start.format('hh:mm A');
+
+        start.add(15, 'minutes');
+        const endSlot = start.format('hh:mm A');
+
         let myslot = {
             startTime: currentSlot,
             endTime: endSlot,
             status: 'active'
-        }
+        };
         timeSlots.push(myslot);
     }
     return timeSlots;
 }
+
+// async function getTimeSlots(startTime, endTime) {
+//     const start = new Date(`${startTime}`);
+//     const end = new Date(`${endTime}`);
+
+//     start.setSeconds(0, 0);
+//     end.setSeconds(0, 0);
+  
+//     const timeSlots = [];
+  
+//     while (start < end) {
+//         const currentSlot = start.toLocaleTimeString('en-US', {
+//             hour12: true,
+//             hour: '2-digit',
+//             minute: '2-digit',
+            
+//         });
+  
+//         start.setMinutes(start.getMinutes() + 15);
+//         const endSlot = start.toLocaleTimeString('en-US', {
+//             hour12: true,
+//             hour: '2-digit',
+//             minute: '2-digit',
+            
+//         });
+      
+//         let myslot = {
+//             startTime: currentSlot,
+//             endTime: endSlot,
+//             status: 'active'
+//         }
+//         timeSlots.push(myslot);
+//     }
+//     return timeSlots;
+// }
+
+
 
 async function addExpertSlots(reqData, currentDate, sessionId, expert_Id) {
     let timeSlot;
