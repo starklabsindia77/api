@@ -329,15 +329,14 @@ app.put('/expertUpdate/:id', upload, async (req, res, next) => {
             "city = '" + reqData.city + "', " +
             "zipCode = '" + reqData.zipCode + "', " +
             "country = '" + reqData.country + "', " +
-            "state = '" + reqData.state + "', " +
-            "isVerified = " + reqData.isVerified + ", " +
+            "state = '" + reqData.state + "', " +            
             "updatedAt = '" + new Date().toJSON().slice(0, 19).replace('T', ' ') + "', " +
             "status = '" + reqData.status + "' WHERE id = " + userId + ";"
 
 
         console.log("string", queryStr);
         await connection.query(queryStr, async function (error, results, fields) {
-            // console.log(error, results);
+            console.log(error, results);
             if (error) {
                 // console.log("error", error);
                 res.send({ message: "error", err: error });
