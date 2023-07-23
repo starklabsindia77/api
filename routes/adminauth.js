@@ -1,6 +1,7 @@
 
 const express = require("express");
 var connection = require("../middlewares/database");
+var upload = require('../middlewares/upload');
 const app = express();
 const cors = require("cors");
 const _ = require("lodash");
@@ -119,6 +120,46 @@ app.post("/register", async (req, res) => {
       res.send(err);
     }
   });
+
+app.put('/adminupdate/:id', upload, async (req, res) => {
+    let userId = req.params.id
+    let reqData = req.body;    
+    try {
+        // make sure that any items are correctly URL encoded in the connection string     
+        if (reqData.status === 'active') {
+            reqData.status = 0;
+        } else {
+            reqData.status = 1;
+        }
+        reqData.firstName = reqData.displayName.split(' ')[0];
+        reqData.lastName = reqData.displayName.split(' ')[1];
+        queryStr = "UPDATE adminusers SET firstName = '" + reqData.firstName + "'," +
+            "lastName = '" + reqData.lastName + "', " +
+            "displayName = '" + reqData.displayName + "'," +
+            "email = '" + reqData.email + "', " +
+            "mobileNo = '" + reqData.mobileNo + "', " +
+            "photoURL = '" + reqData.photoURL + "', " +
+            "address = '" + reqData.address + "', " +
+            "city = '" + reqData.city + "', " +
+            "zipCode = '" + reqData.zipCode + "', " +
+            "country = '" + reqData.country + "', " +
+            "state = '" + reqData.state + "', " +            
+            "updatedAt = '" + new Date().toJSON().slice(0, 19).replace('T', ' ') + "', " +
+            "status = '" + reqData.status + "' WHERE id = " + userId + ";"
+
+        await connection.query(queryStr, async function (error, results, fields) {           
+            if (error) {                
+                res.send({ message: "error", err: error });
+            } else {               
+                res.send({ message: "Admin is updated", success: true });
+            }
+        });
+    } catch (err) {
+        // ... error checks
+        console.log("errornew", err);
+        res.send(err);
+    }
+});
 
 
   module.exports = app;
