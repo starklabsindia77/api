@@ -3,7 +3,7 @@ var mysql = require("mysql");
 const express = require("express");
 var connection = require("../middlewares/database");
 const app = express();
-
+const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
