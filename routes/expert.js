@@ -8,14 +8,9 @@ const _ = require('lodash');
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const bcrypt = require('bcryptjs');
-var Guid = require('guid');
 const config = require("../key");
-// const fetch = require('node-fetch');
-const { isNull } = require('lodash');
-const formidable = require('formidable');
 var Promise = require("bluebird");
 Promise.longStackTraces();
-var cron = require('node-cron');
 const validateUserToken = require('../middlewares/verify-token');
 
 
@@ -34,7 +29,7 @@ app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 // support parsing of application/json type post data
 app.use(cookieParser());
 
-async function getUserinfo(userId, next) {
+async function getUserinfo(userId) {
     let insertQuery = "SELECT au.id as expertId, au.*, ei.* FROM adminusers as au left outer Join expertInfo as ei on au.id = ei.usersId Where au.id = " + userId + "";
     await connection.query(insertQuery, async function (error, results, fields) {
         if (error) {
@@ -46,31 +41,30 @@ async function getUserinfo(userId, next) {
             await connection.query("DELETE FROM adminusers WHERE id = '" + result.id + "'", function (error, results, fields) {
                 if (error) {
                     console.log("error insert", error);
-                    // res.send({ message:"error", err:error });
+                    return false; 
                 } else {
                     console.log("DELETE result ", results);
-                    // result = JSON.parse(JSON.stringify(results[0]));
-                    // req.body.id
-                    next();
+                    return true; 
                 }
             })
 
         }
     });
 }
-async function updateExpertInfo(reqData, insertId, next) {
+async function updateExpertInfo(reqData, insertId) {
     let sqlQuery = "UPDATE expertInfo SET skill = ?, bio = ?, bookingAmount = 200, updatedAt = ? WHERE id = ?";
     let data = [reqData.skill, reqData.bio, new Date().toJSON().slice(0, 19).replace('T', ' '), insertId];
     await connection.query(sqlQuery, data, function (error, results, fields) {
         if (error) {
             console.log("error insert", error);
+            return false;  
         } else {
             console.log("result ", results);
-            next();
+            return true; 
         }
     });
 }
-async function insertExpertInfo(reqData, insertId, next) {
+async function insertExpertInfo(reqData, insertId) {
     let insertQuery =
         "INSERT INTO expertInfo (`skill`, `bio`, `bookingAmount`, `usersId`, `createdAt`, `updatedAt`, `status`) VALUES (?, ?, ?, ?, ?, ?, ?)";
     let data = [
@@ -89,11 +83,11 @@ async function insertExpertInfo(reqData, insertId, next) {
             // res.send({ message:"error", err:error });
         } else {
             console.log("result ", results);
-            next();
+            return true; 
         }
     });
 }
-async function insertExpert(reqData, next) {
+async function insertExpert(reqData) {
 
     if (!reqData.password) {
         reqData.password = "demo1234";
@@ -111,9 +105,7 @@ async function insertExpert(reqData, next) {
             console.log("result ", results);
             insertExpertInfo(reqData, results.insertId, next);
         }
-        next();
-        //   updateResponse = JSON.parse(JSON.stringify(results));
-        //   console.log("result error", updateResponse);
+        return true;  
     });
 }
 
@@ -208,7 +200,7 @@ app.get('/expert/:id', async (req, res) => {
 
 
 // insert single user
-app.post('/expert', upload, async (req, res, next) => {
+app.post('/expert', upload, async (req, res) => {
     let reqData = req.body;
     try {
         // make sure that any items are correctly URL encoded in the connection string
@@ -224,7 +216,7 @@ app.post('/expert', upload, async (req, res, next) => {
                 result = JSON.parse(JSON.stringify(results[0]));
                 res.send({ message: "Expert Already exist try login " });
             } else {
-                await insertExpert(reqData, next);
+                await insertExpert(reqData);
                 res.send({ message: "Expert created successfully!" });
             }
         });
@@ -236,7 +228,7 @@ app.post('/expert', upload, async (req, res, next) => {
 });
 
 // update single user 
-app.put('/expert/:id', upload, async (req, res, next) => {
+app.put('/expert/:id', upload, async (req, res) => {
     let userId = req.params.id
     let reqData = req.body;
     console.log("req", reqData);
@@ -293,7 +285,7 @@ app.put('/expert/:id', upload, async (req, res, next) => {
                 // console.log("error", error);
                 res.send({ message: "error", err: error });
             } else {
-                updateExpertInfo(reqData, reqData.id, next);
+                updateExpertInfo(reqData, reqData.id);
                 res.send({ message: "user is updated", success: true });
 
             }
@@ -306,7 +298,7 @@ app.put('/expert/:id', upload, async (req, res, next) => {
 });
 
 
-app.put('/expertUpdate/:id', upload, async (req, res, next) => {
+app.put('/expertUpdate/:id', upload, async (req, res) => {
     let userId = req.params.id
     let reqData = req.body;    
     try {
@@ -336,7 +328,7 @@ app.put('/expertUpdate/:id', upload, async (req, res, next) => {
             if (error) {                
                 res.send({ message: "error", err: error });
             } else {
-                updateExpertInfo(reqData, reqData.id, next);
+                updateExpertInfo(reqData, reqData.id);
                 res.send({ message: "user is updated", success: true });
 
             }
@@ -350,12 +342,12 @@ app.put('/expertUpdate/:id', upload, async (req, res, next) => {
 
 // delete user from table
 
-app.delete('/expert/:id', async (req, res, next) => {
+app.delete('/expert/:id', async (req, res) => {
     let userId = req.params.id
     console.log('delete user', userId);
     try {        
         let result;
-        getUserinfo(userId, next);
+        getUserinfo(userId);
         let queryStr = "DELETE FROM adminusers WHERE id = '" + userId + "'";
         await connection.query(queryStr, async function (error, results, fields) {
             
