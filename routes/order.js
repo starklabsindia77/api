@@ -48,19 +48,6 @@ function generateUniqueOrderId() {
     return orderId;
   }
 
-async function getUserinfo(userId) {
-    let result;
-    let insertQuery = "SELECT * FROM users Where id = " + userId + "";
-    await connection.query(insertQuery, async function (error, results, fields) {        
-        if (error) {
-            console.log("error insert", error);           
-        } else {
-          result = JSON.parse(JSON.stringify(results[0]));
-          console.log("user info", result);
-          return result;
-        }
-    });
-}
 
   
   // Define the GET API for orders
@@ -139,30 +126,41 @@ async function getUserinfo(userId) {
   
 app.post('/addOrder', async (req, res) => {
     const guid = uuidv4();
-    console.log("inserrt ::::::::::::: ", req.body);
     const userId = req.body.user_id;
+    let userInfo;
    
     try {
-
-        let userInfo = await getUserinfo(userId);
-        const createDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
-        const updatedDate = createDate; // Set the same as createDate for the initial insert
-        const dueDate = new Date();
-        dueDate.setDate(dueDate.getDate() + 20);
-        const orderId = generateUniqueOrderId();
-    
-        console.log("user info 222", userInfo);
-        const { user_id, trans_id, sub_total, shipping_fee, gst, total, cart_info, shipping_info, status} = req.body;
-        let query = 'INSERT INTO `databaseastro`.`orders` (`guid`, `order_id`, `user_id`, `trans_id`, `sub_total`, `shipping_fee`, `gst`,`total`, `cart_info`, `shipping_info`, `status`, `userInfo`, `createDate`, `updatedDate`, `dueDate`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
-         await connection.query(query, [guid, orderId, user_id, trans_id, sub_total, shipping_fee, gst, total, JSON.stringify(cart_info), JSON.stringify(shipping_info), status, userInfo, createDate, updatedDate, dueDate], async function (error, results, fields) {
-            console.log(error, results);
-            if (error){               
-                res.send({ message:"error", err:error });
-            }else {                
-                result =JSON.parse(JSON.stringify(results));             
-                res.send({ status: true, data: result, message: "Order created successfully"});
+        let result;
+        let insertQuery = "SELECT * FROM users Where id = " + userId + "";    
+        await connection.query(insertQuery, async function (error, results, fields) {        
+            if (error) {
+                console.log("error insert", error);           
+            } else {
+              result = JSON.parse(JSON.stringify(results[0]));              
+              userInfo =  JSON.stringify(result);
+                if (userInfo) {
+                    const createDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
+                    const updatedDate = createDate; // Set the same as createDate for the initial insert
+                    const dueDate = new Date();
+                    dueDate.setDate(dueDate.getDate() + 20);
+                    const orderId = generateUniqueOrderId();
+                    const { user_id, trans_id, sub_total, shipping_fee, gst, total, cart_info, shipping_info, status} = req.body;
+                    let query = 'INSERT INTO `databaseastro`.`orders` (`guid`, `order_id`, `user_id`, `trans_id`, `sub_total`, `shipping_fee`, `gst`,`total`, `cart_info`, `shipping_info`, `status`, `userInfo`, `createDate`, `updatedDate`, `dueDate`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+                    await connection.query(query, [guid, orderId, user_id, trans_id, sub_total, shipping_fee, gst, total, JSON.stringify(cart_info), JSON.stringify(shipping_info), status, userInfo, createDate, updatedDate, dueDate], async function (error, results, fields) {
+                        console.log(error, results);
+                        if (error){               
+                            res.send({ message:"error", err:error });
+                        }else {                
+                            result =JSON.parse(JSON.stringify(results));             
+                            res.send({ status: true, data: result, message: "Order created successfully"});
+                        }
+                    });
+               
+                }else{
+                    return res.status(404).json({ message: "User not found" });
+                }
             }
-        });      
+        });          
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
