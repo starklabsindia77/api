@@ -17,8 +17,7 @@ const formidable = require('formidable');
 var Promise = require("bluebird");
 Promise.longStackTraces();
 var cron = require('node-cron');
-const validateUserToken = require('../middlewares/verify-token');
-const verifyToken = require('../middlewares/verify-token');
+
 
 
 
@@ -68,12 +67,13 @@ app.post('/appointment', async (req, res) => {
 });
 
 
-app.get('/appointment', verifyToken, async (req, res) => {
+app.get('/appointment', verify, async (req, res) => {
     try {
         // make sure that any items are correctly URL encoded in the connection string     
         let result;
         let queryStr;
         let expert = req.decoded.user;
+        console.log("req", req.decoded);
 
         if (expert.role !== 'Admin') {
             queryStr = `SELECT app.id as app_id, app.* , au.*, us.*FROM appointment as App left OUTER JOIN users as us on us.id = App.user_id Where App.expert_Id = ${expert.id}`;
