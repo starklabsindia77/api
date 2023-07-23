@@ -1,6 +1,5 @@
 
 var connection = require('../middlewares/database');
-var upload = require('../middlewares/upload');
 var verify = require('../middlewares/verify-token');
 const express = require("express");
 const app = express();
@@ -8,15 +7,10 @@ const cors = require('cors')
 const _ = require('lodash');
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
-const bcrypt = require('bcryptjs');
-var Guid = require('guid');
 const config = require("../key");
-// const fetch = require('node-fetch');
-const { isNull } = require('lodash');
-const formidable = require('formidable');
 var Promise = require("bluebird");
 Promise.longStackTraces();
-var cron = require('node-cron');
+
 
 
 
@@ -73,7 +67,7 @@ app.get('/appointment', verify, async (req, res) => {
         let result;
         let queryStr;
         let expert = req.decoded.user;
-                
+
         if (expert.role !== 'Admin') {
             queryStr = `SELECT app.id as app_id, app.* , us.* FROM appointment as App left OUTER JOIN users as us on us.id = App.user_id Where App.expert_Id = ${expert.id}`;
         } else {

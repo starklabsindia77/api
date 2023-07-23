@@ -2,13 +2,11 @@
 const express = require("express");
 var connection = require("../middlewares/database");
 const app = express();
-
 const cors = require("cors");
 const _ = require("lodash");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const bcrypt = require('bcryptjs');
-
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const tokenExpireTime = "24h";
@@ -55,7 +53,7 @@ app.post("/login", async (req, res) => {
   try {
     let data;
     let queryStr =
-      "SELECT * FROM adminusers WHERE email = '" + reqData.email + "'";
+      "SELECT au.*, ei.skill, ei.bio, ei.bookingAmount FROM adminusers as au left outer join expertinfo as ei on au.id = ei.usersId WHERE au.email '" + reqData.email + "'";
 
     await connection.query(queryStr, async function (error, results, fields) {
       if (error) {

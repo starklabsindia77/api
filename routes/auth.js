@@ -5,25 +5,17 @@ var connection = require("../middlewares/database");
 const app = express();
 
 const cors = require("cors");
-const _ = require("lodash");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
-var Guid = require("guid");
-const jwt = require("jsonwebtoken");
-const nodemailer = require("nodemailer");
+
 const tokenExpireTime = "24h";
 const config = require("../key");
-// const fetch = require('node-fetch');
-const { isNull } = require("lodash");
-const formidable = require("formidable");
+
 var Promise = require("bluebird");
 Promise.longStackTraces();
-var cron = require("node-cron");
-const { ObjectId, MongoClient } = require("mongodb");
 
-serverUrl = config.serverUrl;
-const dbString = config.dbString;
-let enableJobs = config.enableJobs;
+
+
 app.use(cors());
 //to not get any deprecation warning or error
 //support parsing of application/x-www-form-urlencoded post data
