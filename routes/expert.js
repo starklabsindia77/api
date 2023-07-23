@@ -308,8 +308,7 @@ app.put('/expert/:id', upload, async (req, res, next) => {
 
 app.put('/expertUpdate/:id', upload, async (req, res, next) => {
     let userId = req.params.id
-    let reqData = req.body;
-    console.log("req", reqData);
+    let reqData = req.body;    
     try {
         // make sure that any items are correctly URL encoded in the connection string     
         if (reqData.status === 'active') {
@@ -333,12 +332,8 @@ app.put('/expertUpdate/:id', upload, async (req, res, next) => {
             "updatedAt = '" + new Date().toJSON().slice(0, 19).replace('T', ' ') + "', " +
             "status = '" + reqData.status + "' WHERE id = " + userId + ";"
 
-
-        console.log("string", queryStr);
-        await connection.query(queryStr, async function (error, results, fields) {
-            console.log(error, results);
-            if (error) {
-                // console.log("error", error);
+        await connection.query(queryStr, async function (error, results, fields) {           
+            if (error) {                
                 res.send({ message: "error", err: error });
             } else {
                 updateExpertInfo(reqData, reqData.id, next);
