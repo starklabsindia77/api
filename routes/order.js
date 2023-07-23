@@ -35,14 +35,39 @@ app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 // support parsing of application/json type post data
 app.use(cookieParser());
 
+function generateUniqueOrderId() {
+    // Generate a timestamp (number of milliseconds since Jan 1, 1970)
+    const timestamp = Date.now().toString();
+  
+    // Generate a random string using Math.random() and convert it to base36
+    const randomString = Math.random().toString(36).substr(2, 5);
+  
+    // Concatenate the timestamp and random string to create the unique order ID
+    const orderId = timestamp + randomString;
+  
+    return orderId;
+  }
 
+async function getUserinfo(userId) {
+    let insertQuery = "SELECT * FROM users Where id = " + userId + "";
+    await connection.query(insertQuery, async function (error, results, fields) {
+        if (error) {
+            console.log("error insert", error);
+            // res.send({ message:"error", err:error });
+        } else {
+          result = JSON.parse(JSON.stringify(results[0]));
+          return results;
+         
+
+        }
+    });
+}
 
   
   // Define the GET API for orders
   app.get('/orders', async  (req, res) => {
 
-    try {
-        
+    try {        
         let result;
         let queryStr;    
         queryStr = `SELECT * FROM orders`;      
@@ -113,13 +138,19 @@ app.use(cookieParser());
   });
 
   
-  app.post('/addOrder', async (req, res) => {
+app.post('/addOrder', async (req, res) => {
     const guid = uuidv4();
-    console.log("request", req.body);
-    const { order_id, user_id, trans_id, sub_total, shipping_fee, gst, total, cart_info, shipping_info, status} = req.body;
-    let query = 'INSERT INTO `databaseastro`.`orders` (`guid`, `order_id`, `user_id`, `trans_id`, `sub_total`, `shipping_fee`, `gst`,`total`, `cart_info`, `shipping_info`, `status`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+    const userId = req.body.user_id;
+    const userInfo = getUserinfo(userId);
+    const createDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
+    const updatedDate = createDate; // Set the same as createDate for the initial insert
+    const dueDate = new Date();
+    dueDate.setDate(dueDate.getDate() + 20);
+    const orderId = generateUniqueOrderId();
+    const { user_id, trans_id, sub_total, shipping_fee, gst, total, cart_info, shipping_info, status} = req.body;
+    let query = 'INSERT INTO `databaseastro`.`orders` (`guid`, `order_id`, `user_id`, `trans_id`, `sub_total`, `shipping_fee`, `gst`,`total`, `cart_info`, `shipping_info`, `status`, `userInfo`, `createDate`, `updatedDate`, `dueDate`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
     try {
-         await connection.query(query, [guid, order_id, user_id, trans_id, sub_total, shipping_fee, gst, total, JSON.stringify(cart_info), JSON.stringify(shipping_info), status], async function (error, results, fields) {
+         await connection.query(query, [guid, orderId, user_id, trans_id, sub_total, shipping_fee, gst, total, JSON.stringify(cart_info), JSON.stringify(shipping_info), status, JSON.stringify(userInfo), createDate, updatedDate, dueDate], async function (error, results, fields) {
             console.log(error, results);
             if (error){               
                 res.send({ message:"error", err:error });
