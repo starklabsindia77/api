@@ -142,7 +142,7 @@ app.post('/addOrder', async (req, res) => {
    
     try {
 
-        const userInfo = await getUserinfo(userId);
+        let userInfo = await getUserinfo(userId);
         const createDate = new Date().toISOString().slice(0, 19).replace('T', ' ');
         const updatedDate = createDate; // Set the same as createDate for the initial insert
         const dueDate = new Date();
