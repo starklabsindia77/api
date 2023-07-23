@@ -152,7 +152,7 @@ app.post('/addOrder', async (req, res) => {
         console.log("user info 222", userInfo);
         const { user_id, trans_id, sub_total, shipping_fee, gst, total, cart_info, shipping_info, status} = req.body;
         let query = 'INSERT INTO `databaseastro`.`orders` (`guid`, `order_id`, `user_id`, `trans_id`, `sub_total`, `shipping_fee`, `gst`,`total`, `cart_info`, `shipping_info`, `status`, `userInfo`, `createDate`, `updatedDate`, `dueDate`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
-         await connection.query(query, [guid, orderId, user_id, trans_id, sub_total, shipping_fee, gst, total, JSON.stringify(cart_info), JSON.stringify(shipping_info), status, JSON.stringify(userInfo), createDate, updatedDate, dueDate], async function (error, results, fields) {
+         await connection.query(query, [guid, orderId, user_id, trans_id, sub_total, shipping_fee, gst, total, JSON.stringify(cart_info), JSON.stringify(shipping_info), status, userInfo, createDate, updatedDate, dueDate], async function (error, results, fields) {
             console.log(error, results);
             if (error){               
                 res.send({ message:"error", err:error });
