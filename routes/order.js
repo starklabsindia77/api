@@ -118,7 +118,16 @@ function generateUniqueOrderId() {
                 // console.log("error", error);
                 res.send({ message:"error", err:error });
             }else {                
-                result =JSON.parse(JSON.stringify(results));             
+                result =JSON.parse(JSON.stringify(results));
+                result = results.map((row) => {
+                    // Parse the shipping_info field of each row to JSON object
+                    row.cart_info = JSON.parse(row.cart_info);
+                    if(row.userInfo != null){
+                        row.userInfo = JSON.parse(row.userInfo);
+                    }                    
+                    row.shipping_info = JSON.parse(row.shipping_info);
+                    return row;
+                });               
                 res.send({ status: true, data: result});
             }
         });
