@@ -55,7 +55,7 @@ async function getUserinfo(userId) {
             console.log("error insert", error);           
         } else {
           result = JSON.parse(JSON.stringify(results[0]));
-          return results;
+          return result;
         }
     });
 }
