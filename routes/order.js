@@ -116,10 +116,10 @@ app.use(cookieParser());
   app.post('/addOrder', async (req, res) => {
     const guid = uuidv4();
     console.log("request", req.body);
-    const { order_id, user_id, trans_id, sub_total, shipping_fee, gst, total, cart_info, shipping_info, status} = req.body;
+    const { orderId, userId, transId, subTotal, shippingFee, gst, total, cartInfo, shippingInfo, status} = req.body;
     let query = 'INSERT INTO `databaseastro`.`orders` (`guid`, `order_id`, `user_id`, `trans_id`, `sub_total`, `shipping_fee`, `gst`,`total`, `cart_info`, `shipping_info`, `status`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
     try {
-         await connection.query(query, [guid, order_id, user_id, trans_id, sub_total, shipping_fee, gst, total, JSON.stringify(cart_info), JSON.stringify(shipping_info), status], async function (error, results, fields) {
+         await connection.query(query, [guid, orderId, userId.id, transId, subTotal, shippingFee, gst, total, JSON.stringify(cartInfo), JSON.stringify(shippingInfo), status], async function (error, results, fields) {
             console.log(error, results);
             if (error){               
                 res.send({ message:"error", err:error });
