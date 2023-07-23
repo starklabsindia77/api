@@ -49,6 +49,7 @@ function generateUniqueOrderId() {
   }
 
 async function getUserinfo(userId) {
+    let result;
     let insertQuery = "SELECT * FROM users Where id = " + userId + "";
     await connection.query(insertQuery, async function (error, results, fields) {        
         if (error) {
@@ -138,6 +139,7 @@ async function getUserinfo(userId) {
   
 app.post('/addOrder', async (req, res) => {
     const guid = uuidv4();
+    console.log("inserrt ::::::::::::: ", req.body);
     const userId = req.body.user_id;
    
     try {
