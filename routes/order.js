@@ -51,14 +51,13 @@ function generateUniqueOrderId() {
 async function getUserinfo(userId) {
     let insertQuery = "SELECT * FROM users Where id = " + userId + "";
     await connection.query(insertQuery, async function (error, results, fields) {
+        console.log("user info results", results)
         if (error) {
             console.log("error insert", error);
             // res.send({ message:"error", err:error });
         } else {
-          result = JSON.parse(JSON.stringify(results[0]));
+          result = JSON.parse(JSON.stringify(results));
           return results;
-         
-
         }
     });
 }
