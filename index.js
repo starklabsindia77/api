@@ -38,6 +38,7 @@ const authRoutes = require("./routes/auth");
 const emailRoutes = require("./routes/sendemail");
 
 const blogRoutes = require("./routes/blogs");
+const orderRoutes = require("./routes/order");
 // const applicationRoutes = require("./api/application");
 // const ProfileRoutes = require("./api/profile");
 
@@ -51,7 +52,7 @@ app.use("/api", paymentRoutes);
 app.use("/api/admin", appointmentRoutes);
 app.use("/api/admin", emailRoutes);
 app.use("/api/admin", blogRoutes);
-// app.use("/api", wishRoutes);
+app.use("/api/admin", orderRoutes);
 // app.use("/api", roleRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api", authRoutes);

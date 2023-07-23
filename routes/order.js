@@ -9,7 +9,7 @@ const _ = require('lodash');
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const bcrypt = require('bcryptjs');
-var Guid = require('guid');
+const { v4: uuidv4 } = require('uuid');
 const config = require("../key");
 // const fetch = require('node-fetch');
 const { isNull } = require('lodash');
@@ -38,24 +38,19 @@ app.use(cookieParser());
 
 
   
-  // Define the GET API for products
+  // Define the GET API for orders
   app.get('/orders', async  (req, res) => {
 
     try {
-        // make sure that any items are correctly URL encoded in the connection string     
+        
         let result;
-        let queryStr;
-        // let expert = req.decoded.user;
-
-        
-        queryStr = `SELECT * FROM products`;
-        
+        let queryStr;    
+        queryStr = `SELECT * FROM orders`;      
         
             
         await connection.query(queryStr, async function (error, results, fields) {
             // console.log(error, results);
-            if (error){
-                // console.log("error", error);
+            if (error){                
                 res.send({ message:"error", err:error });
             }else {                
                 result =JSON.parse(JSON.stringify(results));             
@@ -66,27 +61,19 @@ app.use(cookieParser());
         // ... error checks
         console.log("errornew", err);
         res.send(err);
-    }
-    // res.send({ status: true, data: mockProducts});
+    }   
   });
 
   app.get('/orders/user/:userId', async  (req, res) => {
-
-    try {
-        // make sure that any items are correctly URL encoded in the connection string     
+    const { userId } = req.params;
+    try {        
         let result;
-        let queryStr;
-        // let expert = req.decoded.user;
-
+        let queryStr; 
+        queryStr = `select * from orders as od left Outer Join users as u On u.id = od.user_id where u.id = ${userId}`;
         
-        queryStr = `SELECT * FROM products`;
-        
-        
-            
         await connection.query(queryStr, async function (error, results, fields) {
             // console.log(error, results);
-            if (error){
-                // console.log("error", error);
+            if (error){              
                 res.send({ message:"error", err:error });
             }else {                
                 result =JSON.parse(JSON.stringify(results));             
@@ -97,23 +84,17 @@ app.use(cookieParser());
         // ... error checks
         console.log("errornew", err);
         res.send(err);
-    }
-    // res.send({ status: true, data: mockProducts});
+    }    
   });
 
   app.get('/orders/:id', async  (req, res) => {
     const { id } = req.params;
-    try {
-        // make sure that any items are correctly URL encoded in the connection string     
+    try {         
         let result;
-        let queryStr;
-        // let expert = req.decoded.user;
+        let queryStr;      
 
-        
-        queryStr = `SELECT * FROM products`;
-        
-        
-            
+        queryStr = `SELECT * FROM orders where id = ${id}`;
+
         await connection.query(queryStr, async function (error, results, fields) {
             // console.log(error, results);
             if (error){
@@ -128,14 +109,24 @@ app.use(cookieParser());
         // ... error checks
         console.log("errornew", err);
         res.send(err);
-    }
-    // res.send({ status: true, data: mockProducts});
+    }    
   });
+
+  
   app.post('/addOrder', async (req, res) => {
-    const { title, description, star, sold, price, icon } = req.body;
+    const guid = uuidv4();
+    const { order_id, user_id, trans_id, sub_total, shipping_fee, gst, total, cart_info, shipping_info, status} = req.body;
+    let query = 'INSERT INTO `databaseastro`.`orders` (`guid`, `order_id`, `user_id`, `trans_id`, `sub_total`, `shipping_fee`, `gst`,`total`, `cart_info`, `shipping_info`, `status`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
     try {
-        const [rows, fields] = await connection.query('INSERT INTO Products (title, description, star, sold, price, icon) VALUES (?, ?, ?, ?, ?, ?)', [title, description, star, sold, price, icon]);
-        res.status(201).json({ message: "Product created successfully" });
+         await connection.query(query, [guid, order_id, user_id, trans_id, sub_total, shipping_fee, gst, total, cart_info, shipping_info, status], async function (error, results, fields) {
+            console.log(error, results);
+            if (error){               
+                res.send({ message:"error", err:error });
+            }else {                
+                result =JSON.parse(JSON.stringify(results));             
+                res.send({ status: true, data: result, message: "Order created successfully"});
+            }
+        });      
     } catch (err) {
         res.status(500).json({ message: err.message });
     }

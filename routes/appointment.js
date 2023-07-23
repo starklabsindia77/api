@@ -48,7 +48,7 @@ app.post('/appointment', async (req, res) => {
 
 
         queryStr = `INSERT INTO appointment ( expert_Id, user_id, start_time, end_time, date, payment_status, transdetails, booking_status, overallDataJsonString, created_at, updated_at ) 
-            VALUES (${reqData.expertId},${reqData.user.id},'${reqData.startTime}','${reqData.endTime}','${reqData.date}','Done','', 'active', '${JSON.stringify(reqData)}', '${new Date().toJSON().slice(0, 19).replace('T', ' ')}', '${new Date().toJSON().slice(0, 19).replace('T', ' ')}')`;
+            VALUES (${reqData.expertId},${reqData.user.id},'${reqData.startTime}','${reqData.endTime}','${reqData.date}','Done','${reqData.transdetails}', 'active', '${JSON.stringify(reqData)}', '${new Date().toJSON().slice(0, 19).replace('T', ' ')}', '${new Date().toJSON().slice(0, 19).replace('T', ' ')}')`;
 
 
         await connection.query(queryStr, async function (error, results, fields) {
