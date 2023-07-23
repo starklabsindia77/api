@@ -73,10 +73,9 @@ app.get('/appointment', verify, async (req, res) => {
         let result;
         let queryStr;
         let expert = req.decoded.user;
-        console.log("req", req.decoded);
-
+                
         if (expert.role !== 'Admin') {
-            queryStr = `SELECT app.id as app_id, app.* , au.*, us.*FROM appointment as App left OUTER JOIN users as us on us.id = App.user_id Where App.expert_Id = ${expert.id}`;
+            queryStr = `SELECT app.id as app_id, app.* , us.* FROM appointment as App left OUTER JOIN users as us on us.id = App.user_id Where App.expert_Id = ${expert.id}`;
         } else {
             queryStr = `SELECT app.id as app_id, app.* , au.*, us.*  FROM appointment as App left OUTER JOIN users as us on us.id = App.user_id 
             left Outer Join adminusers as au on au.id = App.expert_Id `;
