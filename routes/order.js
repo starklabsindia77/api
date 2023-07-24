@@ -183,11 +183,19 @@ app.post('/addOrder', async (req, res) => {
 
 // Update product
 app.put('/order/:id', async (req, res) => {
-    const { title, description, star, sold, price, icon } = req.body;
+    const {dueDate, status } = req.body;
     const { id } = req.params;
+    console.log("body", req.body);
     try {
-        const [rows, fields] = await connection.query('UPDATE Products SET title = ?, description = ?, star = ?, sold = ?, price = ?, icon = ? WHERE id = ?', [title, description, star, sold, price, icon, id]);
-        res.json({ message: "Product updated successfully" });
+        await connection.query('UPDATE `databaseastro`.`orders`  SET `status` = ?, `dueDate` = ? WHERE `id` = ?', [status, dueDate, id], async function (error, results, fields) {
+            console.log(error, results);
+            if (error){               
+                res.send({ message:"error", err:error });
+            }else {                
+                result =JSON.parse(JSON.stringify(results));             
+                res.send({ status: true, data: result, message: "Order updated successfully"});
+            }
+        });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
