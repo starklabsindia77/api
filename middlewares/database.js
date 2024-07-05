@@ -13,6 +13,7 @@ var connection = mysql.createConnection({
     queueLimit: 30,
     acquireTimeout: 1000000,
     database : config.database,
+    
    
   });
 
