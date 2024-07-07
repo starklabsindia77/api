@@ -7,8 +7,8 @@ var httpServer = http.createServer(app);
 let PORT = process.env.PORT || 3001;
 
 const server = https.createServer({
-    key: fs.readFileSync('../../etc/ssl/private.key'), // Your private key
-    cert: fs.readFileSync('../../etc/ssl/certificate.crt') // Your SSL certificate
+    key: fs.readFileSync('./astroscore/private.key'), // Your private key
+    cert: fs.readFileSync('./astroscore/certificate.crt') // Your SSL certificate
   }, app).listen(PORT);
 // const server = httpServer.listen(PORT, () => {
 //     console.log(`Server is up and running on ${PORT} ...`);
