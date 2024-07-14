@@ -55,6 +55,7 @@ app.post("/login", async (req, res) => {
     let data;
     let queryStr =
       "SELECT au.*, ei.skill, ei.bio, ei.bookingAmount FROM adminusers as au left outer join expertinfo as ei on au.id = ei.usersId WHERE au.email = '" + reqData.email + "'";
+    console.log("query result", queryStr);
 
     await connection.query(queryStr, async function (error, results, fields) {
       if (error) {

@@ -1,6 +1,7 @@
 
 var connection = require('../middlewares/database');
-var upload = require('../middlewares/blogUpload');
+// var upload = require('../middlewares/blogUpload');
+var upload = require('../middlewares/azureBlogUpload');
 
 var verify = require('../middlewares/verify-token');
 const express = require("express");
@@ -41,9 +42,9 @@ app.post('/blogs', upload, async (req, res) => {
     try {        
         const guid = uuidv4();
         const { title, description, content, cover, tags, publish, comments, metaTitle, metaDescription, metaKeywords, author } = req.body;
-        const query = `INSERT INTO blogs (guid, title, description, content, cover, tags, publish, comments, metaTitle, metaDescription, metaKeywords, view, comment, share,  author) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )`;
+        const query = `INSERT INTO blogs (guid, title, description, content, cover, tags, publish, comments, metaTitle, metaDescription, metaKeywords, view, comment, share,  author, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,? ,? )`;
 
-        const results = await connection.query(query, [guid, title, description, content, cover, JSON.stringify(tags), publish, comments, metaTitle, metaDescription, JSON.stringify(metaKeywords), 0, 0, 0,  JSON.stringify(author)]);
+        const results = await connection.query(query, [guid, title, description, content, cover, JSON.stringify(tags), publish, comments, metaTitle, metaDescription, JSON.stringify(metaKeywords), 0, 0, 0,  JSON.stringify(author), new Date().toJSON().slice(0, 19).replace('T', ' '), new Date().toJSON().slice(0, 19).replace('T', ' ')]);
         res.status(201).json({ id: results.insertId });
     } catch (error) {
         return res.status(500).json({ error });
@@ -123,9 +124,9 @@ app.get('/blog/posts/all', (req, res) => {
       const { id } = req.params;
       const { title, description, content, cover, tags, publish, comments, metaTitle, metaDescription, metaKeywords, view, comment, share, author } = req.body;
   
-      const query = `UPDATE blogs SET title = ?, description = ?, content = ?, cover = ?, tags = ?, publish = ?, comments = ?, metaTitle = ?, metaDescription = ?, metaKeywords = ?, view = ?, comment = ?, share = ?, author = ? WHERE guid = ?`;
+      const query = `UPDATE blogs SET title = ?, description = ?, content = ?, cover = ?, tags = ?, publish = ?, comments = ?, metaTitle = ?, metaDescription = ?, metaKeywords = ?, view = ?, comment = ?, share = ?, author = ? , updated_at = ? WHERE guid = ?`;
   
-      await connection.query(query, [ title, description, content, cover, JSON.stringify(tags), publish, comments, metaTitle, metaDescription, JSON.stringify(metaKeywords), view, comment, share, JSON.stringify(author), id]);
+      await connection.query(query, [ title, description, content, cover, JSON.stringify(tags), publish, comments, metaTitle, metaDescription, JSON.stringify(metaKeywords), view, comment, share, JSON.stringify(author), new Date().toJSON().slice(0, 19).replace('T', ' '), id]);
       res.status(200).json({ message: `Blog with id: ${id} updated` });
     } catch (error) {
       return res.status(500).json({ error });

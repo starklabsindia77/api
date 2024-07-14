@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@azure/storage-blob": "^12.23.0",
     "aws-sdk": "^2.1347.0",
     "bcryptjs": "^2.4.3",
     "bluebird": "^3.7.2",
