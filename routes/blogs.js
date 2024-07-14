@@ -99,7 +99,7 @@ app.get('/blog/posts/all', (req, res) => {
   app.get('/blog/posts/recent/:guid', (req, res) => {
     try {
       const { guid } = req.params;
-      const query = `SELECT * FROM blogs WHERE guid <> ? ORDER BY createdAt DESC LIMIT 8`;
+      const query = `SELECT * FROM blogs WHERE guid <> ? ORDER BY created_at DESC LIMIT 8`;
   
       connection.query(query, [guid], (error, results) => {
         if (error) {
