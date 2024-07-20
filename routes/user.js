@@ -1,6 +1,6 @@
 
 var connection = require('../middlewares/database');
-var upload = require('../middlewares/upload');
+var upload = require('../middlewares/azureUpload');
 const express = require("express");
 const app = express();
 const cors = require('cors')

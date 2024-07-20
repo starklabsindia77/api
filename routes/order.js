@@ -1,6 +1,6 @@
 
 var connection = require('../middlewares/database');
-var upload = require('../middlewares/upload');
+var upload = require('../middlewares/azureUpload');
 var verify = require('../middlewares/verify-token');
 const express = require("express");
 const app = express();

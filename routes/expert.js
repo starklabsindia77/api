@@ -1,6 +1,6 @@
 
 var connection = require('../middlewares/database');
-var upload = require('../middlewares/upload');
+var upload = require('../middlewares/azureUpload');
 const express = require("express");
 const app = express();
 const cors = require('cors')
@@ -103,7 +103,7 @@ async function insertExpert(reqData) {
             // res.send({ message:"error", err:error });
         } else {
             console.log("result ", results);
-            insertExpertInfo(reqData, results.insertId, next);
+            insertExpertInfo(reqData, results.insertId);
         }
         return true;  
     });
@@ -129,7 +129,8 @@ app.get('/expert', async (req, res) => {
             } else if (results.length > 0) {
 
                 // result =JSON.parse(JSON.stringify(results[0]));                
-                // await updateOTP(result.id, otp, phone);     
+                // await updateOTP(result.id, otp, phone);
+                console.log("res",results);    
                 res.send({ status: true, user: results });
             } else {
                 res.send({ status: true, data: [] });
